@@ -5,6 +5,7 @@ const mission = require('./domain/mission.js');
 //const fs = require('fs');
 
 const DEBUG = false;
+const NOT_FOUND = -1;
 
 const app = express();
 app.use(bodyParser.json());
@@ -23,7 +24,7 @@ app.post('/session/start', async (req, res) => {
         res.send({ "payLoad": loginResult, "error": null });
     }
     catch (e) {
-        res.status(401).send({ "payload": null, "error": "Authentication Failed" });
+        res.status(401).send({ "payload": null, "error": e.message});
     }
 
 
@@ -40,7 +41,7 @@ app.post('/session/end', async (req, res) => {
         res.send({ "payload": "Logout Success", "error": null });
     }
     catch (e) {
-        res.send({ "payload": null, "error": "Logout Failed.  User Session is still intact." });
+        res.send({ "payload": null, "error": "Logout Failed.  User Session is still intact. Reason:" + e.message });
     }
 
 });
@@ -62,7 +63,7 @@ app.post('/mission/new', async (req, res) => {
     let code = req.body.code;
     try {
         let hostId = await session.getUid(idToken);
-        let gameState = mission.new(hostId, code);
+        let gameState = await mission.new(hostId, code);
         res.send({ "payload": gameState, "error": null });
     }
     catch (e) {
@@ -73,11 +74,11 @@ app.post('/mission/new', async (req, res) => {
 });
 
 app.get('/mission/debug', async (req, res) => {
-    res.send(mission.debug());
+    res.send({payload: await mission.debug(), error: null});
 });
 
 
-const NOT_FOUND = -1;
+
 app.post('/mission/:id/join', async (req, res) => {
     //res.send('Hello, World');
     let code = req.body.code;
@@ -91,11 +92,13 @@ app.post('/mission/:id/join', async (req, res) => {
         res.send({"payload": null, "error": "Invalid Session"});
     }
     try {
-        let gameState = mission.join(code, uid);
+        let gameState = await mission.join(code, uid);
         res.send({"payload":gameState, "error": null});
     }
     catch (e) {
-        res.status(409).send(e);
+        res.status(409).send(
+            {"payload": null, "error": e.message}
+        );
     }
 
 });

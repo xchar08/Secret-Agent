@@ -1,15 +1,7 @@
 const { getAuth } = require('firebase-admin/auth');
-const admin = require("firebase-admin");
-
-var serviceAccount = require("../cse3310-game-firebase-adminsdk-wxvpl-58beafe21f.json");
-
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com"
-});
+const { db } = require('./db.js');
 
 
-const db = admin.database();
 const USER_NOT_FOUND = {};
 
 async function verifyToken(idToken) {
@@ -25,7 +17,7 @@ async function login(idToken) {
 
     result = { ...userData, session: idToken };
     console.log("Update  Result:", result);
-    delete(result.firebase);
+    delete (result.firebase);
     await db.ref(`/user/${userData.uid}`).set(result);
 
 
@@ -34,14 +26,10 @@ async function login(idToken) {
 }
 
 async function logout(idToken) {
-    await verifyToken(idToken);
-    let result = userTable.findIndex(x => x.session === idToken);
+    let userData = await verifyToken(idToken);
 
-    if (result !== -1) {
-        userTable[result].session = null;
-        return true;
-    }
-    return false;
+    await db.ref(`/user/${userData.uid}`).remove();
+    return true;
 }
 
 async function data() {
