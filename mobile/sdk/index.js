@@ -67,3 +67,8 @@ async function postData(url = "", data = {}, authToken = "") {
     console.log(data); // JSON data parsed by `data.json()` call
   });
   
+
+  exports.sessionStart = sessionStart;
+  exports.sessionEnd = sessionEnd;
+  exports.missionNew = missionNew;
+  exports.missionJoin = missionJoin;
