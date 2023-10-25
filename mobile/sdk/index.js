@@ -1,6 +1,51 @@
 const baseURL = "https://us-central1-cse3310-game.cloudfunctions.net/node_security_api";
 
 
+
+const ROUND_HOST_INDEX_OFFSET = 1;
+const MISSION_PARTY_NOT_READY = "mission/party_not_ready";
+const MIN_HACK_WIN_VOTE = 1;
+const PARTY_SIZE = 2;   //change this to 5 later
+const MISSION_NOTFOUND = "mission/not_found";
+
+const NOTFOUND = null;
+const PARTY_INDEX_NOT_FOUND = -1;
+
+
+//initial/start phase of a round
+const PHASE_NOT_STARTED = "Round Not Started";
+
+//phases of a round
+const PHASE_TALK = "Phase Talk";
+const PHASE_TEAM_VOTE = "Phase Team Vote";
+const PHASE_TEAM_REVOTE = "Phase Team ReVote";
+const PHASE_NODE_VOTE = "Phase Node Vote";
+const PHASE_OUTCOME = "Phase Outcome";
+
+//final phase
+const PHASE_COMPLETE = "Phase Complete";
+
+const NODE_STATE_OPEN = "open";
+const NODE_STATE_HACKED = "hacked";
+const NODE_STATE_SECURED = "secured";
+
+const NODE_VOTE_Y = "Y";
+const NODE_VOTE_N = "N";
+
+const NODE_1 = 1;
+const NODE_2 = 2;
+const NODE_3 = 3;
+const NODE_4 = 4;
+const NODE_5 = 5;
+
+
+//not started, talk, vote on proposed team, vote on the node, present outcome
+const ROUND_ONE = 1;
+const ROUND_TWO = 2;
+const ROUND_THREE = 3;
+const ROUND_FOUR = 4;
+const ROUND_FIVE = 5;
+
 /**
  * Session Start
  * @param {*} idToken This is the id token issued from firebase authentication after the user signs in with google
@@ -26,7 +71,7 @@ async function sessionEnd(idToken){
  * Mission New the user creates a lobby for a new mission
  * @param {*} idToken This is the id token issued from firebase authentication after the user signs in with google
  * @param {*} code The user entered code for the mission
- * @returns 
+ * @returns The the core mission data
  */
 async function missionNew(idToken, code){
     return await postData(`${baseURL}/mission/new`, {code}, idToken);  
@@ -36,7 +81,7 @@ async function missionNew(idToken, code){
  * Mission Join the user joins a lobby from a given code
  * @param {*} idToken  This is the id token issued from firebase authentication after the user signs in with google
  * @param {*} code the invite code for the mission to join
- * @returns 
+ * @returns the current party
  */
 async function missionJoin(idToken, code){
     return await postData(`${baseURL}/mission/${code}/join`, {code}, idToken);

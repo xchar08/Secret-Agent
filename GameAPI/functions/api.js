@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('./domain/session.js')
 const mission = require('./domain/mission.js');
-//const fs = require('fs');
+
 
 const DEBUG = false;
 const NOT_FOUND = -1;
@@ -11,17 +11,17 @@ const app = express();
 app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
-    //let html = fs.readFileSync("./login.html");
+    //send a test authentication page to generate tokens 
     res.sendFile(__dirname + "/login.html");
 
 });
 
 app.post('/session/start', async (req, res) => {
-
+    //get headers
     let idToken = req.headers['authorization'];
     try {
-        let loginResult = await session.start(idToken);
-        res.send({ "payLoad": loginResult, "error": null });
+        let startResult = await session.start(idToken);
+        res.send({ "payLoad": startResult, "error": null });
     }
     catch (e) {
         res.status(401).send({ "payload": null, "error": e.message});
@@ -37,11 +37,11 @@ app.get('/session/debug', async (req, res) => {
 app.post('/session/end', async (req, res) => {
     let idToken = req.headers['authorization'];
     try {
-        let logoutResult = await session.end(idToken);
+        let endResult = await session.end(idToken);
         res.send({ "payload": "Logout Success", "error": null });
     }
     catch (e) {
-        res.send({ "payload": null, "error": "Logout Failed.  User Session is still intact. Reason:" + e.message });
+        res.send({ "payload": null, "error": "session/end-failed"});
     }
 
 });
@@ -89,7 +89,7 @@ app.post('/mission/:id/join', async (req, res) => {
         uid = await session.getUid(idToken);
     }
     catch (e) {
-        res.send({"payload": null, "error": "Invalid Session"});
+        res.send({"payload": null, "error": "session/bad-id-token"});
     }
     try {
         let gameState = await mission.join(code, uid);
@@ -103,23 +103,43 @@ app.post('/mission/:id/join', async (req, res) => {
 
 });
 
-app.post('/mission/:id/round/:roundId/start', async (req, res) => {
+app.post('/mission/:code/round/advance', async (req, res) => {
+    const code = req.params.code;
+    
+    console.log(code);
+    try {
+       let missionState = await mission.advanceRound(code);
+       //return the outcome of the phase change
+        res.send({"payload": missionState, "error":null});
+    }
+    catch(e)
+    {
+        console.log(e.stack);
+        res.status(500).send({"payload": null, "error":e.message});
+    }
+});
+
+app.get('/mission/:id/round/chat', async (req, res) => {
     res.send('Hello, World');
 });
 
-app.post('/mission/:id/round/:roundId/phase', async (req, res) => {
-    res.send('Hello, World');
-})
-
-app.post('/mission/:id/phase', async (req, res) => {
+app.post('/mission/:id/round/chat', async (req, res) => {
     res.send('Hello, World');
 });
 
-app.get('/mission/:id/round/:roundId/chat', async (req, res) => {
+app.get('/mission/:id/round/team-vote', async (req, res) => {
     res.send('Hello, World');
 });
 
-app.post('/mission/:id/round/:roundId/chat', async (req, res) => {
+app.post('/mission/:id/round/team-vote', async (req, res) => {
+    res.send('Hello, World');
+});
+
+app.get('/mission/:id/round/node-vote', async (req, res) => {
+    res.send('Hello, World');
+});
+
+app.post('/mission/:id/round/node-vote', async (req, res) => {
     res.send('Hello, World');
 });
 
@@ -135,8 +155,10 @@ if (DEBUG == true)
 exports.missionApi = app;
 
 function errorHandler(e, res) {
-    if (e.message.contains("auth")) {
-        res.status(401).send({ "payload": null, "error": "Authentication Failed" });
+
+    console.log(e.message);
+    if (e.message.includes("auth/id-token-expired")) {
+        res.status(401).send({ "payload": null, "error": "session/id-token-expired" });
     }
     else {
         res.status(500).send({ "payload": null, "error": e.message });
