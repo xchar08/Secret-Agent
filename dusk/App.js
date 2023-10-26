@@ -6,7 +6,11 @@ import cityscape from './assets/cityscape.jpg';
 import sunset_cityscape from './assets/sunset_cityscape.jpg';
 import dark_cityscape from './assets/dark_cityscape.jpg';
 
-export default function App() {
+export default function App(){
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   const [isLoggedIn, setLoggedIn] = useState(false);
   const onPressLogIn = () => {
     console.log('Learn More pressed');
@@ -30,6 +34,23 @@ export default function App() {
     setCurrView("signup");
   }
 
+  function SignupForm() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    console.log(email);
+    console.log(password);
+      // Here, you can handle the signup process, such as sending the data to an API or performing client-side validation.
+      // You can access the stored data in the 'name', 'email', and 'password' variables.
+  }
+  function LoginForm() {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    console.log(email);
+    console.log(password);
+      // Here, you can handle the signup process, such as sending the data to an API or performing client-side validation.
+      // You can access the stored data in the 'name', 'email', and 'password' variables.
+  }
+
   const [isSelected, setSelection] = useState(false);
 
   const [currView, setCurrView] = useState("home");
@@ -45,11 +66,16 @@ export default function App() {
             <Text style={styles.text}>Login</Text>
 
             <TextInput 
+              onChangeText={text => setEmail(text)}
+              value={email}
               style={styles.input}
               placeholder="Email" 
               placeholderTextColor="white"
+              
             />
             <TextInput
+              onChangeText={text => setPassword(text)}
+              value={password}
               style={styles.input}
               secureTextEntry={true}
               placeholder="Password"
@@ -128,7 +154,7 @@ export default function App() {
       <View style={styles.container}>
         <ImageBackground source={sunset_cityscape} resizeMode="cover" style={styles.image}>
 
-          <TouchableOpacity style={styles.container} onPress={onPressSpinner}>
+          <TouchableOpacity style={styles.invisibleclick} onPress={onPressSpinner}>
           
           <View style={styles.horizontal}>
             <ActivityIndicator size={100} /> 
@@ -248,5 +274,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     padding: 10,
   },
+
+  invisibleclick:{
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    opacity: 0,
+  }
 
 });
