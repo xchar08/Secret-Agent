@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import cityscape from '../assets/cityscape.jpg';
 
-export default function LoginPage() {
+export default function LoginPage({navigation}) {
 
 const [email, setEmail] = useState('');
 const [password, setPassword] = useState('');
@@ -29,7 +29,7 @@ return (
 
 
             
-            <TouchableOpacity style={styles.loginButton} onPress={() => console.log("Login Button Pressed")}
+            <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('PlayScreen')}
               
               color="#841584"
               accessibilityLabel="Learn more about this purple button"
@@ -39,7 +39,7 @@ return (
               Login
             </Text>  
             </TouchableOpacity>
-            <TouchableOpacity style={styles.loginButton} onPress={() => console.log("Create Account Button Pressed")}
+            <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('SignUpScreen')}
               
               color="#841584"
               accessibilityLabel="Learn more about this purple button"

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import cityscape from '../assets/cityscape.jpg';
 
-export default function boilerplate() {
+export default function boilerplate({navigation}) {
 return (
     <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
         <Text>Boiler Plate</Text>

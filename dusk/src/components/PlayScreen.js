@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import sunset_cityscape from '../assets/sunset_cityscape.jpg';
 
-export default function PlayScreen() {
+export default function PlayScreen({navigation}) {
 return (
     <View style={styles.container}>
     <ImageBackground source={sunset_cityscape} resizeMode="cover" style={styles.image}>
@@ -22,7 +22,7 @@ return (
         </Text>  
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton} onPress={() => console.log("Exit Button Pressed")}
+        <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('SplashScreen')}
           
           color="#841584"
           accessibilityLabel="Learn more about this purple button"

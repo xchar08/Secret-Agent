@@ -2,7 +2,8 @@ import React, {useState} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import dark_cityscape from '../assets/homepagebackground.jpg';
 
-export default function SplashScreen() {
+
+export default function SplashScreen({navigation}) {
     return (
         <View style={styles.container}>
         <ImageBackground source={dark_cityscape} resizeMode="cover" style={styles.image}>
@@ -11,7 +12,7 @@ export default function SplashScreen() {
           <View style={styles.login}>
             <Text style={styles.text}>Home</Text>
             
-            <TouchableOpacity style={styles.loginButton} onPress={() => console.log("Login Button Pressed")}
+            <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('LoginPage')}
               
               color="#841584"
               accessibilityLabel="Learn more about this purple button"
