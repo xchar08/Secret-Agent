@@ -1,0 +1,17 @@
+
+react navigation (NOT react navigation native) --- Compatible with Expo (unlike React Navigation Native)
+    commands run (UPDATED)
+
+    npm install @react-navigation/native
+
+    npm install @react-navigation/native-stack
+
+    npx expo install react-native-screens react-native-safe-area-context
+
+Link to React Navigation Documentation ---> https://reactnavigation.org/docs/getting-started
+
+Good Guides on different RN topics ---> https://www.youtube.com/@codewithbeto/videos
+
+Multiplayer Game using Firebase (with source code) ----> https://www.youtube.com/watch?v=pYLtlG2sqHI
+                                        Source Code ---->https://github.com/asoomar/salad-bowl-app
+                                        4 player demo --> https://www.reddit.com/r/reactnative/comments/heh6xf/i_made_a_react_native_multiplayer_game_my_very/

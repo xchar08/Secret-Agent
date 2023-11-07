@@ -23,18 +23,7 @@ export default function App() {
     </NavigationContainer>
   );
 }
-/*
-export default function App(){
-  return (
-    //<NavigationContainer> Dont uncomment the NavigationCode yet
-    <LoginPage></LoginPage>
-    //<SplashScreen></SplashScreen>
-    //<SignUpScreen></SignUpScreen>
-    //<PlayScreen></PlayScreen>
-    //</NavigationContainer>
-  )
-}
-*/
+
 
 const styles = StyleSheet.create({
   container: {
