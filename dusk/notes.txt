@@ -15,3 +15,14 @@ Good Guides on different RN topics ---> https://www.youtube.com/@codewithbeto/vi
 Multiplayer Game using Firebase (with source code) ----> https://www.youtube.com/watch?v=pYLtlG2sqHI
                                         Source Code ---->https://github.com/asoomar/salad-bowl-app
                                         4 player demo --> https://www.reddit.com/r/reactnative/comments/heh6xf/i_made_a_react_native_multiplayer_game_my_very/
+
+
+        /*makeGameID(length) {
+        let id = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        let seededRandom = rand.create(Date.now());
+        for (let i = 0; i < length; i++) {
+          id += characters.charAt(Math.floor(seededRandom(characters.length)));
+        }
+        return id;
+      } */

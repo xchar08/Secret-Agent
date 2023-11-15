@@ -4,9 +4,13 @@ import cityscape from '../assets/cityscape.jpg';
 
 export default function boilerplate({navigation}) {
 return (
-    <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
-        <Text>Boiler Plate</Text>
-    </ImageBackground>
+    <View style={styles.container}>
+        <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
+            <Text>Boiler Plate</Text>
+            <StatusBar style="auto" />
+            
+        </ImageBackground>
+    </View>
 )
 
 }

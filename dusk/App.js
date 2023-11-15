@@ -7,12 +7,25 @@ import LoginPage from './src/components/LoginPage'
 import SplashScreen from './src/components/SplashScreen'
 import SignUpScreen from './src/components/SignUpScreen'
 import PlayScreen from './src/components/PlayScreen';
+import GameLobby from './src/components/GameLobby';
+import CreateGame from './src/components/CreateGameScreen';
+import JoinGame from './src/components/JoinGameScreen';
+import GameScreen from './src/components/GameScreen';
 
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="GameLobby">
+      <Stack.Screen name="GameLobby" component={GameLobby} />
+      <Stack.Screen name="CreateGame" component={CreateGame} />
+      <Stack.Screen name="JoinGame" component={JoinGame} />
+      <Stack.Screen name="GameScreen" component={GameScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+    /*
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
@@ -21,6 +34,8 @@ export default function App() {
         <Stack.Screen name="LoginPage" component={LoginPage} />
       </Stack.Navigator>
     </NavigationContainer>
+
+    */
   );
 }
 
