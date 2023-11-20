@@ -77,7 +77,7 @@ async function addGame(hostId, code) {
                 state: NODE_STATE_OPEN
             }
         },
-        round: [
+        rounds: [
             {
                 round_host: hostId,
                 label: ROUND_ONE,
