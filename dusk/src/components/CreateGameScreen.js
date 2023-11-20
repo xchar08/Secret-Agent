@@ -1,130 +1,125 @@
-import React, {useState} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
+import React, { useState, useContext } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
+import {missionNew} from '../services/api.service';
 
+import {GameContext} from '../services/gameState';
 
-export default function CreateGame({navigation}) {
+const makeGameID = (length) => {
+  let id = '';
+  const characters = '0123456789';
+  for (let i = 0; i < length; i++) {
+    id += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return id;
+};
 
-    const [name, setName] = useState('');
-    
-    // Function to handle the button press
-    const handleSubmit = () => {
-        // Do something with the entered name, e.g., submit it
-        if (!(name.trim() === ''))
-        {
-            alert(`Hello, ${name}!`);
-        }
-    };
+export default function CreateGame({ navigation }) {
+  const game = useContext(GameContext);
+  const [code, setCode] = useState(makeGameID(4));
 
-      // Determine if the button should be disabled
-      const isButtonDisabled = name.trim() === '';
+  const handleCreateGameButtonPress = () => {
+    game.code = code;
+    console.log(game);
+    missionNew(game.idToken, game.code).then(missionResult => {
+      if (missionResult.error) {
+        console.log(missionResult.error);
+        return;
+      }
+      game.mission = mission;
+      console.log(game);
+    });
+    navigation.navigate('GameScreen', { code })
 
-      const handleCreateGameButtonPress = () => {
-        if (!isButtonDisabled) {
-          let gameID = makeGameID(4);
-          alert(`Game created! GameID: ${gameID} `);
-          navigation.navigate('GameScreen', {gameID})
-          // Perform your action when the button is pressed and the name is not empty
-        } else {
-            alert("Name is required");
-          // Optionally provide feedback that the name is required
-        }
-      };
+  };
 
-      const makeGameID = (length) => {
-        let id = '';
-        const characters = '0123456789';
-        for (let i = 0; i < length; i++) {
-          id += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-        return id;
-      }; 
-
-return (
+  return (
     <View style={styles.container}>
-        <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
+      <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text style={styles.text}>Create Game</Text>
 
-        <TextInput 
-        style={styles.input}
-        placeholder="Enter Name" 
-        placeholderTextColor="darkblue"
-        onChangeText={text => setName(text)}
-        value={name}
-        onSubmitEditing={handleSubmit}
-        />
-        
+        <Text style={styles.text}>Game Join Id: {code}</Text>
         <TouchableOpacity
-          style={[styles.GameLobbyButton, isButtonDisabled && styles.disabledButton]}
+          style={[styles.GameLobbyButton]}
           onPress={handleCreateGameButtonPress}
-          disabled={isButtonDisabled}
+        
         >
-            <Text style={styles.buttonText}>Create Game</Text>  
+          <Text style={styles.buttonText}>Create Game</Text>
         </TouchableOpacity>
         <StatusBar style="auto" />
-        </ImageBackground>
+      </ImageBackground>
     </View>
-)
+  )
 
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        marginTop:StatusBar.currentHeight,
-    },
-    image: {
-        height: '100%',
-        width: '100%',
-        flex: 1,
-        justifyContent: 'center',
-        resizeMode: 'stretch',
-      },
-      text: {
-        color: 'white',
-        fontSize: 42,
-        lineHeight: 84,
-        fontWeight: 'bold',
-        textAlign: 'center',
-        
-        marginLeft: 20,
-        marginRight: 20,
-      },
-      input: {
-        borderColor: 'white',
-        borderWidth: 2,
-        alignItems: 'center',
-        textAlign: 'center',
-        marginLeft: 20,
-        marginRight: 20,
-        marginTop: 5,
-        marginBottom: 10,
-        borderRadius: 0,
-        color: 'darkblue',
-        padding: 10,
-        paddingLeft: 15,
-        backgroundColor: 'white',
-      },
-      GameLobbyButton: {
-        marginTop: 20,
-        marginLeft: 20,
-        marginRight: 20,
-        padding: 15,
-        paddingLeft: 10,  
-        paddingRight: 10, 
-        borderWidth: 2,
-        borderRadius: 8,
-        backgroundColor: 'white',
-      },
-      buttonText: {
-        color: 'darkblue',
-        fontSize: 18,
-        fontWeight: 'bold',
-        textAlign: 'center',
-      },
-      disabledButton: {
-        backgroundColor: 'gray',
-      },
+  container: {
+    flex: 1,
+    marginTop: StatusBar.currentHeight,
+  },
+  image: {
+    height: '100%',
+    width: '100%',
+    flex: 1,
+    justifyContent: 'center',
+    resizeMode: 'stretch',
+  },
+  text: {
+    color: 'white',
+    fontSize: 42,
+    lineHeight: 84,
+    fontWeight: 'bold',
+    textAlign: 'center',
+
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  gameText: {
+    color: 'white',
+    fontSize: 21,
+    lineHeight: 42,
+    fontWeight: 'bold',
+    textAlign: 'center',
+
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  input: {
+    borderColor: 'white',
+    borderWidth: 2,
+    alignItems: 'center',
+    textAlign: 'center',
+    marginLeft: 20,
+    marginRight: 20,
+    marginTop: 5,
+    marginBottom: 10,
+    borderRadius: 0,
+    color: 'darkblue',
+    padding: 10,
+    paddingLeft: 15,
+    backgroundColor: 'white',
+  },
+  GameLobbyButton: {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    padding: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderWidth: 2,
+    borderRadius: 8,
+    backgroundColor: 'white',
+  },
+  buttonText: {
+    color: 'darkblue',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+  },
 
 
 })

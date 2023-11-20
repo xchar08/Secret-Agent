@@ -67,7 +67,7 @@ async function sessionEnd(idToken){
 }
 
 async function sessionDebug() {
-  return await postData(`${baseURL}/session/debug`, null, null);
+  return await getData(`${baseURL}/session/debug`, null, null);
 }
 
 
@@ -91,6 +91,25 @@ async function missionJoin(idToken, code){
     return await postData(`${baseURL}/mission/${code}/join`, {code}, idToken);
 }
 
+async function getData(url = "", authToken = "")
+{
+  const response = await fetch(url, {
+    method: "GET",
+    mode: "cors",
+    cache: "no-cache",
+    credentials: "same-origin",
+    headers: {
+      "Accept": "application/json",
+      "authorization": authToken
+    },
+    redirect: "follow",
+    referrerPolicy: "no-referrer"
+
+  });
+
+
+  return response.json();
+}
 
 // Example POST method implementation from Mozilla.com documentation on fetch, seems to be useful:
 async function postData(url = "", data = {}, authToken = "") {
@@ -109,9 +128,9 @@ async function postData(url = "", data = {}, authToken = "") {
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: (data != null) ? JSON.stringify(data) : undefined, // body data type must match "Content-Type" header
     });
-    console.log("status: ", response.status);
-    let responseData = await response.text();
-    console.log(`Response Data [${url}):`, responseData);
+    // console.log("status: ", response.status);
+    let responseData = await response.json();
+   // console.log(`Response Data [${url}):`, responseData);
     return responseData; // parses JSON response into native JavaScript objects
   }
   /*

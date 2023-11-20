@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { ImageBackground, ActivityIndicator, TouchableOpacity, StyleSheet, Text, TextInput, View } from 'react-native';
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './src/components/LoginPage'
@@ -16,7 +16,15 @@ import { getAuth, signInAnonymously } from "firebase/auth";
 
 
 
+import { GameContext } from './src/services/gameState';
 
+let gameState = {
+  idToken: null,
+  code: null,
+  isHost: null,
+  profile: null,
+  mission: null
+}
 
 const Stack = createNativeStackNavigator();
 
@@ -27,17 +35,23 @@ export default function App() {
   });
 */
 
+  //initialize the game state when the app loads,
+  // and other screens will pull this context to update 
+  //the various fields on the gamestate over time.
+  const [game, setGame] = useState(gameState);
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-      <Stack.Screen name="Login" component={LoginPage} />
-      <Stack.Screen name="GameLobby" component={GameLobby} />
-      <Stack.Screen name="CreateGame" component={CreateGame} />
-      <Stack.Screen name="JoinGame" component={JoinGame} />
-      <Stack.Screen name="GameScreen" component={GameScreen} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <GameContext.Provider value={game}>
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName="Login">
+          <Stack.Screen name="Login" component={LoginPage} />
+          <Stack.Screen name="GameLobby" component={GameLobby} />
+          <Stack.Screen name="CreateGame" component={CreateGame} />
+          <Stack.Screen name="JoinGame" component={JoinGame} />
+          <Stack.Screen name="GameScreen" component={GameScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </GameContext.Provider>
     /*
     <NavigationContainer>
       <Stack.Navigator initialRouteName="SplashScreen">
