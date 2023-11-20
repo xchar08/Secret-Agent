@@ -66,6 +66,10 @@ async function sessionEnd(idToken){
     return await postData(`${baseURL}/session/end`, null, idToken);
 }
 
+async function sessionDebug() {
+  return await postData(`${baseURL}/session/debug`, null, null);
+}
+
 
 /**
  * Mission New the user creates a lobby for a new mission
@@ -98,22 +102,26 @@ async function postData(url = "", data = {}, authToken = "") {
       credentials: "same-origin", // include, *same-origin, omit
       headers: {
         "Content-Type": "application/json",
-        "Authorization": authToken,
+        "authorization": authToken,
         // 'Content-Type': 'application/x-www-form-urlencoded',
       },
       redirect: "follow", // manual, *follow, error
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data), // body data type must match "Content-Type" header
+      body: (data != null) ? JSON.stringify(data) : undefined, // body data type must match "Content-Type" header
     });
-    return response.json(); // parses JSON response into native JavaScript objects
+    console.log("status: ", response.status);
+    let responseData = await response.text();
+    console.log(`Response Data [${url}):`, responseData);
+    return responseData; // parses JSON response into native JavaScript objects
   }
-  
+  /*
   postData("https://example.com/answer", { answer: 42 }).then((data) => {
     console.log(data); // JSON data parsed by `data.json()` call
-  });
+  });*/
   
 
   exports.sessionStart = sessionStart;
   exports.sessionEnd = sessionEnd;
+  exports.sessionDebug = sessionDebug;
   exports.missionNew = missionNew;
   exports.missionJoin = missionJoin;

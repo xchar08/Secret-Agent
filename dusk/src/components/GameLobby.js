@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import bluebackground from '../assets/bluebackground.png';
-
+import {sessionDebug} from '../services/api.service';
 export default function GameLobby({navigation}) {
+
+  sessionDebug();
 return (
     <View style={styles.container}>
         <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>

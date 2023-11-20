@@ -12,23 +12,10 @@ import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
 import { getAuth, signInAnonymously } from "firebase/auth";
-import firebaseApp from './src/environments/config';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-const auth = initializeAuth(firebaseApp, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
 
 
-signInAnonymously(auth)
-  .then((value) => {
-    console.log(value.user.getIdToken());
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    // ...
-  });
+
+
 
 
 const Stack = createNativeStackNavigator();
@@ -43,7 +30,8 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="GameLobby">
+      <Stack.Navigator initialRouteName="Login">
+      <Stack.Screen name="Login" component={LoginPage} />
       <Stack.Screen name="GameLobby" component={GameLobby} />
       <Stack.Screen name="CreateGame" component={CreateGame} />
       <Stack.Screen name="JoinGame" component={JoinGame} />
