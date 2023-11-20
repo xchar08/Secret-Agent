@@ -33,6 +33,7 @@ export default function CreateGame({ navigation }) {
 
   };
 
+  //console.log("game", game);
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>

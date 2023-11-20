@@ -91,6 +91,10 @@ async function missionJoin(idToken, code){
     return await postData(`${baseURL}/mission/${code}/join`, {code}, idToken);
 }
 
+async function missionDebug() {
+  return await getData(`${baseURL}/mission/debug`, null, null);
+}
+
 async function getData(url = "", authToken = "")
 {
   const response = await fetch(url, {
@@ -144,3 +148,4 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.sessionDebug = sessionDebug;
   exports.missionNew = missionNew;
   exports.missionJoin = missionJoin;
+  exports.missionDebug = missionDebug;

@@ -1,9 +1,13 @@
-import React, {useState, useEffect} from 'react';
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
+import React, {useState, useEffect, useContext} from 'react';
+import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity, Image} from 'react-native'; 
 import bluebackground from '../assets/bluebackground.png';
 import {sessionDebug} from '../services/api.service';
-export default function GameLobby({navigation}) {
+import {GameContext} from '../services/gameState';
 
+export default function GameLobby({navigation}) {
+  const game = useContext(GameContext);
+  const image = game.profile.picture;
+ // console.log("game:", game);
   const [sessions, setSessions]  = useState([]);
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
@@ -29,14 +33,22 @@ return (
         { didStart && <Text>{sessionLength} Online Users:</Text> }
         <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
             <Text style ={styles.text}>Secret Message</Text>
-
-            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => navigation.navigate('CreateGame')}
+            
+            { image && <Image source={{uri : image}}  style={styles.profileImage} /> }
+            <Text style ={styles.userName}>Welcome {game.profile.name}</Text>
+            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => {
+              game.isHost = true;
+              navigation.navigate('CreateGame');
+            }}
             color="#841584"
             >
                 <Text style={styles.buttonText}>Create Game</Text>  
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => navigation.navigate('JoinGame')}
+            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => {
+              game.isHost = false;
+              navigation.navigate('JoinGame');
+            }}
             color="#841584"
             >
                 <Text style={styles.buttonText}>Join Game</Text>  
@@ -60,10 +72,27 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         resizeMode: 'stretch',
       },
+      profileImage: {
+        width: '100%',
+        flex: 1,
+        justifyContent: 'center',
+        resizeMode: 'stretch'
+        
+      },
       text: {
         color: 'white',
         fontSize: 42,
         lineHeight: 84,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        
+        marginLeft: 20,
+        marginRight: 20,
+      },
+      userName: {
+        color: 'white',
+        fontSize: 21,
+        lineHeight: 42,
         fontWeight: 'bold',
         textAlign: 'center',
         

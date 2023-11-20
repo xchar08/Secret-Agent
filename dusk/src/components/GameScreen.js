@@ -1,14 +1,16 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity} from 'react-native'; 
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
+import { GameContext} from '../services/gameState';
 
 export default function GameLobby({navigation, route}) {
+    const game = useContext(GameContext);
     const {gameID} = route.params;
 return (
     <View style={styles.container}>
         <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-            <Text style={styles.text}>{`Game ID: ${gameID}`}</Text>
+            <Text style={styles.text}>{`Game ID: ${game.code}`}</Text>
             <Timer style={styles.timer}></Timer>
             <StatusBar style="auto" />
         </ImageBackground>

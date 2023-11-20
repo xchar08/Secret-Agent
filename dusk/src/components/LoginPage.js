@@ -54,7 +54,9 @@ export default function LoginPage({ navigation }) {
       //console.log(userProfile);
       setIsSigninInProgress(false);
       game.idToken = token;
-      game.profile = userProfile;
+      
+      game.profile = userProfile.payLoad;
+      console.log(game);
       navigation.navigate('GameLobby');
 
     } catch (error) {
@@ -81,6 +83,8 @@ export default function LoginPage({ navigation }) {
             color={GoogleSigninButton.Color.Dark}
             onPress={handleSignIn}
             disabled={isSigninInProgress}
+            
+            
           />
         </View>
       </ImageBackground>
@@ -140,6 +144,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 10,
     paddingBottom: 60,
+    alignItems: 'center'
   },
 
   loginButton: {
