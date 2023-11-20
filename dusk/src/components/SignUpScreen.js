@@ -18,7 +18,7 @@ export default function SignUpScreen({ navigation }) {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password);
       console.log(response);
-      alert('conformation email sent');
+      alert('Account created!');
     } catch (error) {
       console.log(error);
       alert('signUp failed: ' + error.message);
