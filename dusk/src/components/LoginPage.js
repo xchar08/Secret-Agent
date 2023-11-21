@@ -56,7 +56,7 @@ export default function LoginPage({ navigation }) {
       game.idToken = token;
       
       game.profile = userProfile.payLoad;
-      console.log(game);
+      //console.log(game);
       navigation.navigate('GameLobby');
 
     } catch (error) {

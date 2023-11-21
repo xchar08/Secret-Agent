@@ -22,7 +22,7 @@ export default function JoinGame({ navigation }) {
     async function getSession() {
 
       const response = (await missionDebug());
-      console.log(response.payload);
+      //console.log(response.payload);
       setSessions(response.payload);
       setDidStart(true);
       setSessionLength(Object.keys(response.payload).length);
@@ -36,12 +36,23 @@ export default function JoinGame({ navigation }) {
   }), [])
 
   handleJoin = (item) => {
-    missionJoin(game.idToken, item.code)
+    missionJoin(game.idToken, item.code).then(joinMissionResult => {
+      if (joinMissionResult.error)
+      {
+        console.log("Join Failed.", joinMissionResult.error);
+        return;
+      }
+      //console.log("MISSION JOINED", joinMissionResult.payload);
+      game.mission = item;
+      game.code = item.code;
+      let code = item.code;
+      navigation.navigate("GameScreen", {code});
+    });
   }
 
   _renderItem = ({ item }) => {
 
-    console.log("Session: ", item);
+    //console.log("Session: ", item);
 
     return (
       <TouchableOpacity onPress={() => handleJoin(item)}>

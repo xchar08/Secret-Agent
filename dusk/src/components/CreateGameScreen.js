@@ -26,7 +26,7 @@ export default function CreateGame({ navigation }) {
         console.log(missionResult.error);
         return;
       }
-      game.mission = mission;
+      game.mission = missionResult.payload;
       console.log(game);
     });
     navigation.navigate('GameScreen', { code })
