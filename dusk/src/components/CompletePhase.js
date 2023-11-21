@@ -5,9 +5,8 @@ import Timer from './Timer';
 import { GameContext} from '../services/gameState';
 
 
-export default function CompletePhase({navigation, route}) {
+export default function CompletePhase() {
     const game = useContext(GameContext);
-    const {gameID} = route.params;
 return (
     <View style={styles.container}>
         <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>

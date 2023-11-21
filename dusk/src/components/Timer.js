@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const Timer = () => {
+const Timer = ({limit, onLimit}) => {
   const [seconds, setSeconds] = useState(0);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
       setSeconds(prevSeconds => prevSeconds + 1);
+
+      if (seconds === limit)
+      {
+        onLimit();
+      }
     }, 1000);
 
     // Clean up the interval when the component is unmounted
@@ -25,7 +30,8 @@ const Timer = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.timerText}>{formatTime(seconds)}</Text>
+      { (seconds < limit) && <Text style={styles.timerText}>{formatTime(seconds)}</Text> }
+      { (seconds >= limit) && <Text style={styles.timerText}>Times up!</Text>}
     </View>
   );
 };

@@ -95,6 +95,10 @@ async function missionDebug() {
   return await getData(`${baseURL}/mission/debug`, null, null);
 }
 
+async function missionAdvance(idToken, code) {
+  return await postData(`${baseURL}/mission/${code}/round/advance`, null, idToken);
+}
+
 async function getData(url = "", authToken = "")
 {
   const response = await fetch(url, {
@@ -149,3 +153,12 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.missionNew = missionNew;
   exports.missionJoin = missionJoin;
   exports.missionDebug = missionDebug;
+  exports.missionAdvance = missionAdvance;
+
+  exports.PHASE_NOT_STARTED = PHASE_NOT_STARTED;
+  exports.PHASE_TALK = PHASE_TALK;
+  exports.PHASE_TEAM_VOTE = PHASE_TEAM_VOTE
+  exports.PHASE_TEAM_REVOTE = PHASE_TEAM_REVOTE
+  exports.PHASE_NODE_VOTE = PHASE_NODE_VOTE
+  exports.PHASE_OUTCOME = PHASE_OUTCOME
+  exports.PHASE_COMPLETE = PHASE_COMPLETE

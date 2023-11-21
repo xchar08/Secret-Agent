@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 import { GameContext } from '../services/gameState';
-import {PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE } from '../services/api.service';
+import {PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, missionAdvance } from '../services/api.service';
 import ChatPhase from './ChatPhase';
 import NotStartedPhase from './NotStartedPhase';
 import TeamVotePhase from './TeamVotePhase';
@@ -13,26 +13,52 @@ import CompletePhase from './CompletePhase';
 
 export default function GameLobby({ navigation, route }) {
   const game = useContext(GameContext);
-  const { gameID } = route.params;
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
 
-  hostHandleStart()
+  const hostHandleStart = () =>
   {
+    console.log("Handle Start Pressed");
     setPhaseKey(PHASE_TALK);
+    missionAdvance(game.idToken, game.code).then((mission) => {
+      setPhaseKey(PHASE_CHAT);
+      game.mission = mission;
+    });
+  };
+
+
+
+  const handleChatEnd = () => {
+    missionAdvance(game.idToken, game.code).then((mission) => {
+      setPhaseKey(PHASE_TEAM_VOTE);
+      game.mission = mission;
+    });
+  };
+
+  const handleTeamVoteEnd = () => {
+    missionAdvance(game.idToken, game.code).then((mission) => {
+      setPhaseKey(PHASE_NODE_VOTE);
+      game.mission = mission;
+    });
   }
 
+  const handleNodeVoteEnd = () => {
+    missionAdvance(game.idToken, game.code).then((mission) => {
+      setPhaseKey(PHASE_OUTCOME);
+      game.mission = mission;
+    });
+  }
 
-
-
+  
 
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} />}
-        {phasekey === PHASE_TALK && <ChatPhase />}
-        {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase />}
-        {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase />}
-        {phasekey === PHASE_NODE_VOTE && <NodeVotePhase />}
+        <Text>GameId: {game.code}</Text>
+        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game}/>}
+        {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
+        {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
+        {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
+        {phasekey === PHASE_NODE_VOTE && <NodeVotePhase onEnd={handleNodeVoteEnd} />}
         {phasekey === PHASE_OUTCOME && <OutcomePhase />}
         {phasekey === PHASE_COMPLETE && <CompletePhase />}
         <StatusBar style="auto" />
