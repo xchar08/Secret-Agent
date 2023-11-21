@@ -16,10 +16,19 @@ export default function GameLobby({ navigation, route }) {
   const { gameID } = route.params;
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
 
+  hostHandleStart()
+  {
+    setPhaseKey(PHASE_TALK);
+  }
+
+
+
+
+
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase />}
+        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} />}
         {phasekey === PHASE_TALK && <ChatPhase />}
         {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase />}
         {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase />}

@@ -5,14 +5,23 @@ import Timer from './Timer';
 import { GameContext} from '../services/gameState';
 
 
-export default function NotStartedPhase({navigation, route}) {
+export default function NotStartedPhase(handleStart) {
     const game = useContext(GameContext);
     const {gameID} = route.params;
+    const [isHost, setIsHost] = useState(game.isHost);
+    
 return (
     <View style={styles.container}>
         <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
             <Text>Welcome to Purgatory.....(participantCount / 5)</Text>
-            <Timer style={styles.timer}></Timer>
+            {
+                isHost && <TouchableOpacity onPress={handleStart}>
+                    <Text>Start Game</Text>
+                </TouchableOpacity>
+            }
+            {
+                !isHost && <Text>Waiting on host start.</Text>
+            }
             <StatusBar style="auto" />
         </ImageBackground>
     </View>
