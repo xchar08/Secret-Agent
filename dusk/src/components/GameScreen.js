@@ -19,17 +19,14 @@ export default function GameLobby({ navigation, route }) {
 
   return (
     /*
-    <View style={styles.container}>
-      <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-        <Text style={styles.text}>{`Game ID: ${gameID}`}</Text>
-        <Text style={styles.text}>{`Name: ${name}`}</Text>
-        <Timer style={styles.timer}></Timer>
-        <StatusBar style="auto" />
-      </ImageBackground>
-    </View>
+      Screen is broken into 3 containers 
+      headerBox (blue background)
+      bodyBox (white background)
+      bottomBox (blue background)
     */
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
+
         <View style={styles.headerBox}>
           <View>
             <Text style={styles.roundText}>{`Round ${round}`}</Text>
@@ -40,9 +37,12 @@ export default function GameLobby({ navigation, route }) {
             <Text style={styles.headerText}>{`Your Role: ${role}`}</Text>
           </View>
         </View>
+
         <View style={styles.mainBox}>
 
         </View>
+
+
         <View style={styles.bottomBox}>
           {circleStatus.map((isGreen, index) => (
             <TouchableOpacity
