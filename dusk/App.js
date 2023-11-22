@@ -4,14 +4,12 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './src/components/LoginPage'
-import SplashScreen from './src/components/SplashScreen'
-import SignUpScreen from './src/components/SignUpScreen'
-import PlayScreen from './src/components/PlayScreen';
+
 import GameLobby from './src/components/GameLobby';
 import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
-import { getAuth, signInAnonymously } from "firebase/auth";
+
 
 
 

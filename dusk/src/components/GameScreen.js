@@ -1,36 +1,61 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 import { GameContext } from '../services/gameState';
-import {PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, missionAdvance } from '../services/api.service';
+import { PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, missionAdvance } from '../services/api.service';
 import ChatPhase from './ChatPhase';
 import NotStartedPhase from './NotStartedPhase';
 import TeamVotePhase from './TeamVotePhase';
 import NodeVotePhase from './NodeVotePhase';
 import OutcomePhase from './OutcomePhase';
 import CompletePhase from './CompletePhase';
-import database from '@react-native-firebase/database';
-import firebase from '@react-native-firebase/app';
-import { firebaseConfig } from '../environments/config';
+import { ref } from 'firebase/database';
+
+
+
+//const options = {
+//  ...firebaseConfig
+//}
+/*
+const missionApp = await firebase.initializeApp({
+  appId: options.appId,
+  projectId: options.projectId,
+  apiKey: options.apiKey,
+  clientId: options.authDomain,
+  androidClientId: options.authDomain,
+  messagingSenderId: options.messagingSenderId,
+  storageBucket: options.storageBucket,
+  databaseURL: options.databaseURL
+
+}, "missionApp");
+*/
 
 export default function GameLobby({ navigation, route }) {
-  const {game, setGame} = useContext(GameContext);
+  const { game, setGame } = useContext(GameContext);
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
 
-  //firebase.initializeApp("second", firebaseConfig).then((fbApp) => {
-    const reference = database().ref(`/mission/${game.code}`);
 
-    reference.on('value', (snapshot) => {
-      setGame({...game, mission : snapshot.val()});
-    });
-  
-  //});
+  useEffect(() => {
 
+    const reference = ref(`/mission/${game.code}`);
+    
  
 
-  const hostHandleStart = () =>
-  {
+    //reference.on('value', (snapshot) => {
+      //console.log("meow", snapshot.val());
+      //setGame({ ...game, mission: snapshot.val() });
+    //});
+
+  }, [game]);
+
+
+
+
+
+
+
+  const hostHandleStart = () => {
     console.log("Handle Start Pressed");
     setPhaseKey(PHASE_TALK);
     missionAdvance(game.idToken, game.code).then((mission) => {
@@ -63,13 +88,13 @@ export default function GameLobby({ navigation, route }) {
     });
   }
 
-  
+
 
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text>GameId: {game.code}</Text>
-        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game}/>}
+        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} />}
         {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
         {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
         {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}

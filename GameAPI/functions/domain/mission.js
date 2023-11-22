@@ -389,9 +389,9 @@ async function advanceRound(code) {
     }
 
     console.log(mission);
-    await db.ref(`/mission/${code}`).set(mission);
+    return await get(hostId, code);
 
-    return mission;
+    
 
 }
 

@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import cityscape from '../assets/cityscape.jpg';
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { GoogleAuthProvider, getAuth, signInAnonymously, signInWithCredential } from "firebase/auth";
+import { GoogleAuthProvider, getAuth, signInWithCredential } from "firebase/auth";
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -10,13 +10,14 @@ import {
 } from '@react-native-google-signin/google-signin';
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { sessionStart } from '../services/api.service';
-import firebaseApp from '../environments/config';
+import {firebaseApp} from '../environments/config';
 
 import {GameContext} from '../services/gameState';
 
 const auth = initializeAuth(firebaseApp, {
   persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
+
 
 export default function LoginPage({ navigation }) {
 

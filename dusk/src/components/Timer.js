@@ -8,7 +8,7 @@ const Timer = ({limit, onLimit}) => {
     const intervalId = setInterval(() => {
       setSeconds(prevSeconds => prevSeconds + 1);
 
-      if (seconds === limit)
+      if ((seconds+1) === limit)
       {
         onLimit();
       }
