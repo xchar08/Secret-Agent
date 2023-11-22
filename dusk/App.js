@@ -41,7 +41,7 @@ export default function App() {
   const [game, setGame] = useState(gameState);
 
   return (
-    <GameContext.Provider value={game}>
+    <GameContext.Provider value={{game, setGame}}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginPage} />

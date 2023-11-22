@@ -6,7 +6,7 @@ import { initializeApp } from "firebase/app";
 import {getAuth, signInAnonymously} from "firebase/auth";
 
 // Your web app's Firebase configuration
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyAW5OxWzEVtm9EyPJHkaiO3yTZarFAXrEA",
   authDomain: "cse3310-game.firebaseapp.com",
   databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com",

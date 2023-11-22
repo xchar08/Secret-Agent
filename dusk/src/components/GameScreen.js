@@ -10,17 +10,31 @@ import TeamVotePhase from './TeamVotePhase';
 import NodeVotePhase from './NodeVotePhase';
 import OutcomePhase from './OutcomePhase';
 import CompletePhase from './CompletePhase';
+import database from '@react-native-firebase/database';
+import firebase from '@react-native-firebase/app';
+import { firebaseConfig } from '../environments/config';
 
 export default function GameLobby({ navigation, route }) {
-  const game = useContext(GameContext);
+  const {game, setGame} = useContext(GameContext);
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
+
+  //firebase.initializeApp("second", firebaseConfig).then((fbApp) => {
+    const reference = database().ref(`/mission/${game.code}`);
+
+    reference.on('value', (snapshot) => {
+      setGame({...game, mission : snapshot.val()});
+    });
+  
+  //});
+
+ 
 
   const hostHandleStart = () =>
   {
     console.log("Handle Start Pressed");
     setPhaseKey(PHASE_TALK);
     missionAdvance(game.idToken, game.code).then((mission) => {
-      setPhaseKey(PHASE_CHAT);
+      setPhaseKey(PHASE_TALK);
       game.mission = mission;
     });
   };
@@ -30,7 +44,8 @@ export default function GameLobby({ navigation, route }) {
   const handleChatEnd = () => {
     missionAdvance(game.idToken, game.code).then((mission) => {
       setPhaseKey(PHASE_TEAM_VOTE);
-      game.mission = mission;
+      game.mission = mission.payload;
+      console.log("chat ended", mission);
     });
   };
 

@@ -5,7 +5,7 @@ import {sessionDebug} from '../services/api.service';
 import {GameContext} from '../services/gameState';
 
 export default function GameLobby({navigation}) {
-  const game = useContext(GameContext);
+  const {game, setGame} = useContext(GameContext);
   const image = game.profile.picture;
  // console.log("game:", game);
   const [sessions, setSessions]  = useState([]);
@@ -28,6 +28,17 @@ export default function GameLobby({navigation}) {
 
   }), [])
   
+
+  const handleCreateGame = () => {
+    setGame({...game, isHost : true});
+    navigation.navigate('CreateGame');
+  };
+
+  const handleJoinGame = () => {
+    setGame({...game, isHost : false});
+    navigation.navigate('JoinGame');
+  };
+
 return (
     <View style={styles.container}>
         { didStart && <Text>{sessionLength} Online Users:</Text> }
@@ -36,19 +47,13 @@ return (
             
             { image && <Image source={{uri : image}}  style={styles.profileImage} /> }
             <Text style ={styles.userName}>Welcome {game.profile.name}</Text>
-            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => {
-              game.isHost = true;
-              navigation.navigate('CreateGame');
-            }}
+            <TouchableOpacity style={styles.GameLobbyButton} onPress={handleCreateGame}
             color="#841584"
             >
                 <Text style={styles.buttonText}>Create Game</Text>  
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.GameLobbyButton} onPress={() => {
-              game.isHost = false;
-              navigation.navigate('JoinGame');
-            }}
+            <TouchableOpacity style={styles.GameLobbyButton} onPress={handleJoinGame}
             color="#841584"
             >
                 <Text style={styles.buttonText}>Join Game</Text>  

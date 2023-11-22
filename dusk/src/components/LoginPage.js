@@ -20,7 +20,7 @@ const auth = initializeAuth(firebaseApp, {
 
 export default function LoginPage({ navigation }) {
 
-  const game = useContext(GameContext);
+  const {game, setGame} = useContext(GameContext);
   //disable the google sign in button after clicking signin
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
 
@@ -53,9 +53,13 @@ export default function LoginPage({ navigation }) {
       let userProfile = await sessionStart(token);
       //console.log(userProfile);
       setIsSigninInProgress(false);
-      game.idToken = token;
-      
-      game.profile = userProfile.payLoad;
+
+      setGame({
+        ...game,
+        idToken: token,
+        profile: userProfile.payLoad,
+      });
+
       //console.log(game);
       navigation.navigate('GameLobby');
 

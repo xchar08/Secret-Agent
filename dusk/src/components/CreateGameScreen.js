@@ -15,19 +15,23 @@ const makeGameID = (length) => {
 };
 
 export default function CreateGame({ navigation }) {
-  const game = useContext(GameContext);
+  const {game, setGame} = useContext(GameContext);
   const [code, setCode] = useState(makeGameID(4));
 
   const handleCreateGameButtonPress = () => {
-    game.code = code;
-    console.log(game);
-    missionNew(game.idToken, game.code).then(missionResult => {
+
+    missionNew(game.idToken, code).then(missionResult => {
       if (missionResult.error) {
         console.log(missionResult.error);
         return;
       }
-      game.mission = missionResult.payload;
-      console.log(game);
+
+      setGame({
+        ...game,
+        code,
+        mission: missionResult.payload
+      })
+      
     });
     navigation.navigate('GameScreen', { code })
 

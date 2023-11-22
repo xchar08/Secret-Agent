@@ -12,7 +12,7 @@ import { GameContext } from '../services/gameState';
 
 export default function JoinGame({ navigation }) {
 
-  const game = useContext(GameContext);
+  const {game, setGame} = useContext(GameContext);
   const [sessions, setSessions] = useState([]);
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
@@ -43,10 +43,16 @@ export default function JoinGame({ navigation }) {
         return;
       }
       //console.log("MISSION JOINED", joinMissionResult.payload);
-      game.mission = item;
-      game.code = item.code;
-      let code = item.code;
-      navigation.navigate("GameScreen", {code});
+
+      setGame({
+        ...game,
+        mission : item,
+        code: item.code,
+
+
+      });
+  
+      navigation.navigate("GameScreen", {code: item.code});
     });
   }
 

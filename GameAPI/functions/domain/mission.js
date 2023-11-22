@@ -293,6 +293,20 @@ async function gameData() {
     return enriched;
 }
 
+async function get(hostId, code) {
+
+    let mission = (await db.ref(`/mission/${code}`).once('value')).val();
+
+
+    let missionEnriched = {
+        ...mission,
+        party: (await db.ref(`/mission-party/${code}`).once('value')).val(),
+        nodes: (await db.ref(`/mission-nodes/${code}`).once('value')).val(),
+        rounds: (await db.ref(`/mission-rounds/${code}`).once('value')).val()
+    }
+    return missionEnriched
+
+}
 
 
 
@@ -432,6 +446,7 @@ async function getNodeVote(code) {
 exports.new = addGame;
 exports.debug = gameData;
 exports.join = joinGame;
+exports.get = get;
 exports.advanceRound = advanceRound;
 exports.sendChat = sendChat;
 exports.getChat = getChat;

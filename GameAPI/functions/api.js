@@ -77,6 +77,19 @@ app.get('/mission/debug', async (req, res) => {
     res.send({payload: await mission.debug(), error: null});
 });
 
+app.get('/mission/:id', async (req, res) => {
+    let idToken = req.headers['authorization'];
+    const code = req.params.code;
+    try {
+        let hostId = await session.getUid(idToken);
+        res.send({payload: await mission.get(hostId, code)});
+    }
+    catch(e)
+    {
+        errorHandler(e, res);
+    }
+    
+})
 
 
 app.post('/mission/:id/join', async (req, res) => {

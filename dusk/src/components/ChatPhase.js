@@ -6,7 +6,7 @@ import { GameContext } from '../services/gameState';
 import { missionAdvance } from '../services/api.service';
 
 export default function ChatPhase({onEnd}) {
-    const game = useContext(GameContext);
+    const {game, setGame} = useContext(GameContext);
 
     const handleTimeLimit = () => {
         console.log("Time Limit Advance: ", game.code, game.idToken);
