@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const Timer = () => {
-  const [seconds, setSeconds] = useState(0);
+  const [seconds, setSeconds] = useState(60); // Initial seconds value for countdown
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setSeconds(prevSeconds => prevSeconds + 1);
+      setSeconds(prevSeconds => (prevSeconds > 0 ? prevSeconds - 1 : 0));
     }, 1000);
 
     // Clean up the interval when the component is unmounted
@@ -15,13 +15,12 @@ const Timer = () => {
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
-    const remainingSeconds = timeInSeconds % 60;
+    const seconds = timeInSeconds % 60;
 
-    const formattedMinutes = String(minutes).padStart(2, '0');
-    const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-
-    return `${formattedMinutes}:${formattedSeconds}`;
+    return minutes > 0 ? `${minutes}:${String(seconds).padStart(2, '0')}` : String(seconds);
   };
+
+
 
   return (
     <View style={styles.container}>
@@ -39,7 +38,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: "white",
+    color: 'white',
   },
 });
 
