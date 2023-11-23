@@ -10,7 +10,10 @@ import TeamVotePhase from './TeamVotePhase';
 import NodeVotePhase from './NodeVotePhase';
 import OutcomePhase from './OutcomePhase';
 import CompletePhase from './CompletePhase';
-import { ref } from 'firebase/database';
+
+
+import { firebase } from '@react-native-firebase/database';
+
 
 
 
@@ -34,25 +37,49 @@ const missionApp = await firebase.initializeApp({
 export default function GameLobby({ navigation, route }) {
   const { game, setGame } = useContext(GameContext);
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
-
+  const [playersJoined, setPlayersJoined] = useState(1);
 
   useEffect(() => {
+    const reference = firebase
+    .app()
+    .database('https://cse3310-game-default-rtdb.firebaseio.com')
+    .ref(`/mission/${game.code}`)
+    .on('value', (snapshot) => {
+      console.log("meow", snapshot.val());
+      if (snapshot.val() != null) 
+      {
+        setPhaseKey(snapshot.val().current_phase);
+      }
+      
 
-    const reference = ref(`/mission/${game.code}`);
+    });
+
+  const secondReference = firebase.app().database('https://cse3310-game-default-rtdb.firebaseio.com')
+  .ref(`/mission-party/${game.code}`).on('value', (snapshot) => {
+    console.log("bark", snapshot.val());
+
+
+    if (snapshot.val() != null) {
+      console.log(playersJoined, Object.keys(snapshot.val()).length);
+      setPlayersJoined(Object.keys(snapshot.val()).length);
+    }
+  });
+
+  const thirdReference = firebase
+    .app()
+    .database('https://cse3310-game-default-rtdb.firebaseio.com')
+    .ref(`/mission/${game.code}`)
+    .once('value').then(value => {
+      console.log("hello", value);
+    })
+
+  return () => {
+    firebase.app().database('').ref(`/mission/${game.code}`).off('value', reference);
+    firebase.app().database('').ref(`/mission-party/${game.code}`).off('child_added', secondReference);
     
- 
-
-    //reference.on('value', (snapshot) => {
-      //console.log("meow", snapshot.val());
-      //setGame({ ...game, mission: snapshot.val() });
-    //});
-
+  }
   }, [game]);
-
-
-
-
-
+  
 
 
   const hostHandleStart = () => {
@@ -94,7 +121,7 @@ export default function GameLobby({ navigation, route }) {
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text>GameId: {game.code}</Text>
-        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} />}
+        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} partySize={playersJoined} />}
         {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
         {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
         {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}

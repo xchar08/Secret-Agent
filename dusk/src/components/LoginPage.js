@@ -14,9 +14,7 @@ import {firebaseApp} from '../environments/config';
 
 import {GameContext} from '../services/gameState';
 
-const auth = initializeAuth(firebaseApp, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+
 
 
 export default function LoginPage({ navigation }) {

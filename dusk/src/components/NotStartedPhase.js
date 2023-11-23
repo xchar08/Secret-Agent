@@ -5,18 +5,16 @@ import Timer from './Timer';
 import { GameContext } from '../services/gameState';
 
 
-export default function NotStartedPhase({ onStart, game }) {
+export default function NotStartedPhase({ onStart, game, partySize }) {
 
     const [isHost, setIsHost] = useState(game.isHost);
-    console.log(game.mission);
-    const [participantCount, setParticipantCount] = useState(/*Object.keys(game.mission.party).length*/ 1);
-
+   
     return (
         <View style={styles.container}>
             <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
                 <View style={styles.backDrop}>
                     <Text style={styles.text}>Welcome to Purgatory</Text>
-                    <Text style={styles.text}> ({participantCount} / 5)</Text>
+                    <Text style={styles.text}> ({partySize} / 5)</Text>
                     {
                         isHost && 
                         <TouchableOpacity onPress={onStart} style={styles.button}>

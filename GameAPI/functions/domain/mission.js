@@ -157,9 +157,11 @@ async function addGame(hostId, code) {
 
     // gameTable.push(gameState);
 
-    let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code };
+    let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [{hostId}] };
     await db.ref(`/mission/${code}`).set(mission);
-    await db.ref(`/mission-party/${code}`).push(hostId);
+    await db.ref(`/mission-party/${code}`).push(hostId).then((value) => {
+        console.log(value);
+    });
     //await db.ref(`/mission-hackers/${code}`).set([]);
     await db.ref(`/mission-nodes/${code}/1`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/2`).set({ state: NODE_STATE_OPEN });
@@ -391,7 +393,7 @@ async function advanceRound(code) {
     console.log(mission);
     return await get(hostId, code);
 
-    
+
 
 }
 

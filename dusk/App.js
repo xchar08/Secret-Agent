@@ -4,14 +4,31 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './src/components/LoginPage'
-
 import GameLobby from './src/components/GameLobby';
 import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
+import { firebase } from '@react-native-firebase/database';
+
+const auth = initializeAuth(firebaseApp, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
 
 
+let options = {
+  apiKey: "AIzaSyAW5OxWzEVtm9EyPJHkaiO3yTZarFAXrEA",
+  authDomain: "cse3310-game.firebaseapp.com",
+  databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com",
+  projectId: "cse3310-game",
+  storageBucket: "cse3310-game.appspot.com",
+  messagingSenderId: "739597303932",
+  appId: "1:739597303932:web:3cb760a5849478110009f9"
+}
+firebase.initializeApp(options);
 
 
 import { GameContext } from './src/services/gameState';
