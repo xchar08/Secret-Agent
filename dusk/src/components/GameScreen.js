@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 
+
 export default function GameLobby({ navigation, route }) {
   const { gameID } = route.params;
   const [round, setRound] = useState(2); //dynamic round count
@@ -15,6 +16,25 @@ export default function GameLobby({ navigation, route }) {
     newCircleStatus[index] = !newCircleStatus[index];
     setCircleStatus(newCircleStatus);
   }
+
+  const players = [
+    { id: 1, name: 'Player 1' },
+    { id: 2, name: 'Player 2' },
+    { id: 3, name: 'Player 3' },
+    { id: 4, name: 'Player 4' },
+    { id: 5, name: 'Player 5' },
+  ];
+
+  const proposedTeam = [
+  ]
+
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+  const handlePlayerPress = (player) => {
+    setSelectedPlayer(player);
+    // You can add your multiplayer code here using the selected player's information
+  };
+
 
 
   return (
@@ -39,7 +59,25 @@ export default function GameLobby({ navigation, route }) {
         </View>
 
         <View style={styles.mainBox}>
-
+          <View style={styles.hexagonContainer}>
+            {players.map((player) => (
+              <TouchableOpacity
+                key={player.id}
+                style={styles.hexagonSlice}
+                onPress={() => handlePlayerPress(player)}
+              >
+                <Text style={styles.playerName}>{player.name}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <View>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={() => console.log("hello")}
+            >
+              <Text style={styles.blackText}>Submit Team Proposal</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
 
@@ -96,7 +134,10 @@ const styles = StyleSheet.create({
   },
   mainBox: {
     flex: 3,
+    flexDirection: 'vertical',
     backgroundColor: 'white', //Intentionally overwrites the parent container's background color
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   bottomBox: {
     flex: 1,
@@ -140,6 +181,39 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginHorizontal: 10,
   },
-
+  hexagonContainer: {
+    flexDirection: 'vertical',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hexagonSlice: {
+    width: 200,
+    height: 58,
+    backgroundColor: '#3248a8',
+    margin: 2,
+    borderRadius: 100,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  playerName: {
+    textAlign: 'center',
+    color: 'white',
+    margin: 10,
+  },
+  submitButton: {
+    width: 300,
+    height: 40,
+    backgroundColor: 'white',
+    margin: 1,
+    borderRadius: 100,
+    borderColor: '#3248a8',
+    borderWidth: 2,
+  },
+  blackText: {
+    textAlign: 'center',
+    color: '#3248a8',
+    fontSize: 20,
+    margin: 5,
+  }
 
 })
