@@ -1,25 +1,24 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import cityscape from '../assets/cityscape.jpg';
-import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import { GoogleAuthProvider, getAuth, signInWithCredential } from "firebase/auth";
+
+//import { GoogleAuthProvider, getAuth, signInWithCredential } from "firebase/auth";
 import {
   GoogleSignin,
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
+
 import { sessionStart } from '../services/api.service';
-import {firebaseApp} from '../environments/config';
+import { GameContext } from '../services/gameState';
 
-import {GameContext} from '../services/gameState';
-
-
-
+import firebase from '@react-native-firebase/app';
+import { firebase as authProvider } from '@react-native-firebase/auth';
 
 export default function LoginPage({ navigation }) {
 
-  const {game, setGame} = useContext(GameContext);
+
+  const { game, setGame } = useContext(GameContext);
   //disable the google sign in button after clicking signin
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
 
@@ -35,21 +34,45 @@ export default function LoginPage({ navigation }) {
 
   //function handler for the google sign in click
   function handleSignIn() {
-    setIsSigninInProgress(true);
-    signIn();
+    /*let options = {
+      apiKey: "AIzaSyAW5OxWzEVtm9EyPJHkaiO3yTZarFAXrEA",
+      authDomain: "cse3310-game.firebaseapp.com",
+      databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com",
+      projectId: "cse3310-game",
+      storageBucket: "cse3310-game.appspot.com",
+      messagingSenderId: "739597303932",
+      appId: "1:739597303932:web:3cb760a5849478110009f9"
+    }*/
+
+
+   // const firebaseApp = firebase.initializeApp(options).then(async () => {
+      const FIREBASE_AUTH = authProvider.auth(/*firebaseApp*/);
+      setIsSigninInProgress(true);
+      signIn(FIREBASE_AUTH);
+   // });
   }
 
 
   //function that calls the google sign in web screen
-  signIn = async () => {
+  signIn = async (FIREBASE_AUTH) => {
     try {
+
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      const credential = GoogleAuthProvider.credential(userInfo.idToken);
-      const firebaseUser = await signInWithCredential(getAuth(), credential);
-      let token = await firebaseUser.user.getIdToken();
-      //console.log(token);
-      let userProfile = await sessionStart(token);
+
+      //const credential = GoogleAuthProvider.credential(userInfo.idToken);
+      //const firebaseUser = await signInWithCredential(getAuth(), credential);
+      //let token = await firebaseUser.user.getIdToken();
+
+
+      const credential = authProvider.auth.GoogleAuthProvider.credential(userInfo.idToken);
+      const firebaseUser = await FIREBASE_AUTH.signInWithCredential(credential);
+
+      const token = await firebaseUser.user.getIdToken();
+
+
+      console.log(token);
+      const userProfile = await sessionStart(token);
       //console.log(userProfile);
       setIsSigninInProgress(false);
 
@@ -61,6 +84,8 @@ export default function LoginPage({ navigation }) {
 
       //console.log(game);
       navigation.navigate('GameLobby');
+
+
 
     } catch (error) {
       console.log(error);
@@ -77,21 +102,21 @@ export default function LoginPage({ navigation }) {
   };
 
   return (
-    
-      <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
-        <View style={styles.login}>
-          <Text style={styles.text}>Login</Text>
-          <GoogleSigninButton
-            size={GoogleSigninButton.Size.Wide}
-            color={GoogleSigninButton.Color.Dark}
-            onPress={handleSignIn}
-            disabled={isSigninInProgress}
-            
-            
-          />
-        </View>
-      </ImageBackground>
- 
+
+    <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
+      <View style={styles.login}>
+        <Text style={styles.text}>Login</Text>
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={handleSignIn}
+          disabled={isSigninInProgress}
+
+
+        />
+      </View>
+    </ImageBackground>
+
   )
 
 }

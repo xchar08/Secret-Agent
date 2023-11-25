@@ -312,14 +312,23 @@ async function get(hostId, code) {
 
 
 
-async function advanceRound(code) {
+async function advanceRound(hostId, code) {
     let mission = { ...((await db.ref(`/mission/${code}`).once('value')).val()) };
 
     if (mission === NOTFOUND) {
         throw Error(MISSION_NOTFOUND);
     }
-    currentParty = Object.values((await db.ref(`/mission-party/${code}`).once('value')).val());
-    console.log(currentParty);
+
+    const missionPartyObject = (await db.ref(`/mission-party/${code}`).once('value')).val();
+    console.log("mission party", code, missionPartyObject);
+    if (missionPartyObject) {
+        currentParty = Object.values(missionPartyObject);
+        console.log(currentParty);
+    }
+    else
+    {
+        currentParty = [];
+    }
     if (currentParty.length < PARTY_SIZE) {
         throw Error(MISSION_PARTY_NOT_READY);
     }
@@ -336,11 +345,13 @@ async function advanceRound(code) {
                 let round = (await db.ref(`/mission-rounds/${code}/${mission.round_number}`).once('value')).val();
                 await db.ref(`/mission-rounds/${code}/${mission.round_number}`).set({ ...round, round_host: currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET] });
                 mission.round_host = currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET];
+                await db.ref(`/mission/${code}`).set({...mission, current_phase : PHASE_TALK});
             }
             break;
         case PHASE_TALK:
             {
                 mission.current_phase = PHASE_TEAM_VOTE;
+                await db.ref(`/mission/${code}`).set({...mission, current_phase : PHASE_TEAM_VOTE});
             }
             break;
         case PHASE_TEAM_REVOTE:
@@ -356,6 +367,8 @@ async function advanceRound(code) {
 
                     mission.current_phase = PHASE_NODE_VOTE;
                 }
+                await db.ref(`/mission/${code}`).set({...mission});
+                
             }
             break;
         case PHASE_NODE_VOTE:
@@ -374,6 +387,7 @@ async function advanceRound(code) {
 
                 }
                 mission.current_phase = PHASE_OUTCOME;
+                await db.ref(`/mission/${code}`).set({...mission});
             }
             break;
         case PHASE_OUTCOME:
@@ -384,6 +398,7 @@ async function advanceRound(code) {
                 else {
                     mission.current_phase = PHASE_COMPLETE;
                 }
+                await db.ref(`/mission/${code}`).set({...mission});
             }
             break;
         default:

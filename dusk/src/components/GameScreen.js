@@ -11,10 +11,7 @@ import NodeVotePhase from './NodeVotePhase';
 import OutcomePhase from './OutcomePhase';
 import CompletePhase from './CompletePhase';
 
-
-import { firebase } from '@react-native-firebase/database';
-
-
+import { firebase as databaseProvider } from '@react-native-firebase/database';
 
 
 //const options = {
@@ -35,60 +32,91 @@ const missionApp = await firebase.initializeApp({
 */
 
 export default function GameLobby({ navigation, route }) {
+
+  const FIREBASE_DATABASE = databaseProvider.database();
   const { game, setGame } = useContext(GameContext);
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
   const [playersJoined, setPlayersJoined] = useState(1);
+  const { gameID } = route.params;
+  const [round, setRound] = useState(2); //dynamic round count
+  const [code, setCode] = useState(game.code);
+  const [isHost, setIsHost] = useState(game.isHost);
+  const [players, setPlayers] = useState(game.party ? Object.values(game.party) : [
+    { id: 1, name: 'Player 1' },
+    { id: 2, name: 'Player 2' },
+    { id: 3, name: 'Player 3' },
+    { id: 4, name: 'Player 4' },
+    { id: 5, name: 'Player 5' },
+  ]);
+  const [circleStatus, setCirclStatus] = useState(game.nodes ? game.nodes.filter(node => node != null) : Array(5).fill(false));
+
+
 
   useEffect(() => {
-    const reference = firebase
-    .app()
-    .database('https://cse3310-game-default-rtdb.firebaseio.com')
-    .ref(`/mission/${game.code}`)
-    .on('value', (snapshot) => {
-      console.log("meow", snapshot.val());
-      if (snapshot.val() != null) 
-      {
-        setPhaseKey(snapshot.val().current_phase);
-      }
-      
-
-    });
-
-  const secondReference = firebase.app().database('https://cse3310-game-default-rtdb.firebaseio.com')
-  .ref(`/mission-party/${game.code}`).on('value', (snapshot) => {
-    console.log("bark", snapshot.val());
+    const reference = FIREBASE_DATABASE
+      .ref(`/mission/${game.code}`)
+      .on('value', (snapshot) => {
+        console.log("meow", snapshot.val());
+        if (snapshot.val() != null) {
+          setPhaseKey(snapshot.val().current_phase);
+        }
 
 
-    if (snapshot.val() != null) {
-      console.log(playersJoined, Object.keys(snapshot.val()).length);
-      setPlayersJoined(Object.keys(snapshot.val()).length);
+      });
+
+    const secondReference = FIREBASE_DATABASE
+      .ref(`/mission-party/${game.code}`).on('value', (snapshot) => {
+        console.log("bark", snapshot.val());
+
+
+        if (snapshot.val() != null) {
+          console.log(playersJoined, Object.keys(snapshot.val()).length);
+          setPlayersJoined(Object.keys(snapshot.val()).length);
+        }
+      });
+
+    const thirdReference = FIREBASE_DATABASE.ref(`/mission/${game.code}`)
+      .once('value').then(value => {
+        console.log("hello", value);
+      })
+
+    return () => {
+      FIREBASE_DATABASE.ref(`/mission/${game.code}`).off('value', reference);
+      FIREBASE_DATABASE.ref(`/mission-party/${game.code}`).off('child_added', secondReference);
+
     }
-  });
-
-  const thirdReference = firebase
-    .app()
-    .database('https://cse3310-game-default-rtdb.firebaseio.com')
-    .ref(`/mission/${game.code}`)
-    .once('value').then(value => {
-      console.log("hello", value);
-    })
-
-  return () => {
-    firebase.app().database('').ref(`/mission/${game.code}`).off('value', reference);
-    firebase.app().database('').ref(`/mission-party/${game.code}`).off('child_added', secondReference);
-    
-  }
   }, [game]);
-  
+
 
 
   const hostHandleStart = () => {
-    console.log("Handle Start Pressed");
+    console.log("Handle Start Pressed", game);
     setPhaseKey(PHASE_TALK);
     missionAdvance(game.idToken, game.code).then((mission) => {
-      setPhaseKey(PHASE_TALK);
-      game.mission = mission;
+      console.log("Advancing", mission);
+      //setPhaseKey(PHASE_TALK);
+      game.mission = mission.payload;
     });
+  };
+
+
+
+  const handlePress = (index) => { //replace inside contents of code as needed
+    const newCircleStatus = [...circleStatus];
+    newCircleStatus[index] = !newCircleStatus[index];
+    //setCircleStatus(newCircleStatus);
+  }
+
+
+
+  const proposedTeam = [
+  ]
+
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+  const handlePlayerPress = (player) => {
+    setSelectedPlayer(player);
+    // You can add your multiplayer code here using the selected player's information
   };
 
 
@@ -97,21 +125,36 @@ export default function GameLobby({ navigation, route }) {
     missionAdvance(game.idToken, game.code).then((mission) => {
       setPhaseKey(PHASE_TEAM_VOTE);
       game.mission = mission.payload;
+      setRound(game.mission.round_number); //dynamic round count
+      setCode(game.code);
+      setIsHost(game.isHost);
+      setPlayers(game.party ? Object.values(game.party) : [
+        { id: 1, name: 'Player 1' },
+        { id: 2, name: 'Player 2' },
+        { id: 3, name: 'Player 3' },
+        { id: 4, name: 'Player 4' },
+        { id: 5, name: 'Player 5' },
+      ]);
       console.log("chat ended", mission);
     });
   };
 
+  const handleSubmitTeam = (team) => {
+    console.log("Handle Submit Team");
+    submitTeam(game.idToken, game.code, team);
+  }
+
   const handleTeamVoteEnd = () => {
     missionAdvance(game.idToken, game.code).then((mission) => {
       setPhaseKey(PHASE_NODE_VOTE);
-      game.mission = mission;
+      game.mission = mission.payload;
     });
   }
 
   const handleNodeVoteEnd = () => {
     missionAdvance(game.idToken, game.code).then((mission) => {
       setPhaseKey(PHASE_OUTCOME);
-      game.mission = mission;
+      game.mission = mission.payload;
     });
   }
 
@@ -123,7 +166,16 @@ export default function GameLobby({ navigation, route }) {
         <Text>GameId: {game.code}</Text>
         {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} partySize={playersJoined} />}
         {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
-        {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
+        {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase
+          onEnd={handleTeamVoteEnd}
+          onSubmitTeam={handleSubmitTeam}
+          circleStatus={circleStatus}
+          round={round}
+          players={players}
+          isHost={isHost}
+          code={code} />
+        }
+
         {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
         {phasekey === PHASE_NODE_VOTE && <NodeVotePhase onEnd={handleNodeVoteEnd} />}
         {phasekey === PHASE_OUTCOME && <OutcomePhase />}
@@ -139,6 +191,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: StatusBar.currentHeight,
+    //marginTop: StatusBar.currentHeight,
+    flexDirection: 'column',
+  },
+  bar: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center', // Center content horizontally
+    alignItems: 'center', // Center content vertically
+    padding: 10,
+  },
+  roundText: {
+    fontStyle: 'italic',
+    fontSize: 30,
+    color: 'white',
+  },
+  headerText: {
+    fontStyle: 'italic',
+    fontSize: 15,
+    color: 'white',
   },
   image: {
     height: '100%',
@@ -146,6 +217,23 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     resizeMode: 'stretch',
+  },
+  headerBox: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  mainBox: {
+    flex: 3,
+    flexDirection: 'vertical',
+    backgroundColor: 'white', //Intentionally overwrites the parent container's background color
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bottomBox: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   text: {
     color: 'white',
@@ -175,8 +263,69 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   timer: {
-    //alignSelf: 'top', doesnt work
+
+    marginLeft: 20,
+    marginRight: 20,
   },
+  GameLobbyButton: {
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20,
+    padding: 15,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderWidth: 2,
+    borderRadius: 8,
+    backgroundColor: 'white',
+  },
+  buttonText: {
+    color: 'darkblue',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  timer: {
 
+  },
+  circle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    marginHorizontal: 10,
+  },
+  hexagonContainer: {
+    flexDirection: 'vertical',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hexagonSlice: {
+    width: 200,
+    height: 58,
+    backgroundColor: '#3248a8',
+    margin: 2,
+    borderRadius: 100,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  playerName: {
+    textAlign: 'center',
+    color: 'white',
+    margin: 10,
+  },
+  submitButton: {
+    width: 300,
+    height: 40,
+    backgroundColor: 'white',
+    margin: 1,
+    borderRadius: 100,
+    borderColor: '#3248a8',
+    borderWidth: 2,
+  },
+  blackText: {
+    textAlign: 'center',
+    color: '#3248a8',
+    fontSize: 20,
+    margin: 5,
+  }
 
-})
+});

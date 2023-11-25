@@ -17,7 +17,7 @@ export default function ChatPhase({onEnd}) {
     return (
         <View style={styles.container}>
             <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-                <Text style={styles.timerText}><Timer style={styles.timer} limit={20} onLimit={handleTimeLimit}></Timer> / 0:20</Text>
+                <Timer style={styles.timer} limit={20} onLimit={handleTimeLimit}></Timer>
                 <View style={styles.backDrop}>
                     <Text style={styles.text}> Discuss anything during this phase.  The next phase will pick a team that will determine the fate of this round's node.</Text>
 

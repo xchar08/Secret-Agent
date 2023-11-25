@@ -5,17 +5,73 @@ import Timer from './Timer';
 import { GameContext } from '../services/gameState';
 
 
-export default function TeamVotePhase() {
+export default function TeamVotePhase({round, isHost, players, circleStatus, onSubmitTeam, code}) {
     const { game, setGame } = useContext(GameContext);
+    console.log("game:", game);
+    const [playersSelected, setPlayersSelected] = useState([]);
+
+    function handlePlayerPress(player) {
+        setPlayersSelected([...playersSelected, player]);
+    }
+
+    console.log("circleStatus: ", circleStatus);
+    console.log("players", players);
+    console.log("isHost", isHost);
+    console.log("code", code);
+    console.log("round", round);
 
     return (
+
         <View style={styles.container}>
             <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-                <Text>Discuss anything during this phase.  The next phase will pick a team that will determine the fate of this round's node.</Text>
-                <Timer style={styles.timer}></Timer>
+
+                <View style={styles.headerBox}>
+                    <View>
+                        <Text style={styles.roundText}>{`Round ${round}`}</Text>
+                    </View>
+                    <View style={styles.bar}>
+                        <Text style={styles.headerText}>{`Game ID: ${code}`}</Text>
+                        <Timer style={styles.timer}></Timer>
+                        <Text style={styles.headerText}>{`Your Role: ${(isHost) ? "Host" : "Participant"}`}</Text>
+                    </View>
+                </View>
+
+                <View style={styles.mainBox}>
+                    <View style={styles.hexagonContainer}>
+                        {players.map((player) => (
+                            <TouchableOpacity
+                                key={player.id}
+                                style={styles.hexagonSlice}
+                                onPress={() => handlePlayerPress(player)}
+                            >
+                                <Text style={styles.playerName}>{player.name}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                    <View>
+                        <TouchableOpacity
+                            style={styles.submitButton}
+                            onPress={() => onSubmitTeam(playersSelected)}
+                        >
+                            <Text style={styles.blackText}>Submit Team Proposal</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+
+
+                <View style={styles.bottomBox}>
+                    {circleStatus.map((isGreen, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={[styles.circle, { backgroundColor: isGreen ? 'green' : 'red' }]}
+                            onPress={() => handlePress(index)}
+                        />
+                    ))}
+                </View>
                 <StatusBar style="auto" />
             </ImageBackground>
         </View>
+
     )
 
 }

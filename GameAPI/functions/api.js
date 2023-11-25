@@ -118,10 +118,17 @@ app.post('/mission/:id/join', async (req, res) => {
 
 app.post('/mission/:code/round/advance', async (req, res) => {
     const code = req.params.code;
-    
-    console.log(code);
+    let idToken = req.headers['authorization'];
+    let uid = NOT_FOUND;
+    console.log("advance request params extracted: ", { code, idToken });
     try {
-       let missionState = await mission.advanceRound(code);
+        uid = await session.getUid(idToken);
+    }
+    catch (e) {
+        res.send({"payload": null, "error": "session/bad-id-token"});
+    }
+    try {
+       let missionState = await mission.advanceRound(uid, code);
        //return the outcome of the phase change
         res.send({"payload": missionState, "error":null});
     }

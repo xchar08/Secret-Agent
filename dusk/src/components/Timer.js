@@ -2,36 +2,45 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const Timer = ({limit, onLimit}) => {
-  const [seconds, setSeconds] = useState(0);
+  console.log("Limit: ", limit);
+  //const [prevSeconds, setPrevSeconds] = useState(limit); // Initial seconds value for countdown
+  let prevSeconds = limit;
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setSeconds(prevSeconds => prevSeconds + 1);
+  //  console.log("Mounted: ", prevSeconds);
+  const intervalId = setInterval(() => {
 
-      if ((seconds+1) === limit)
-      {
-        onLimit();
-      }
-    }, 1000);
+    // if (prevSeconds === 0) return;
+     prevSeconds = prevSeconds - 1;
+     
+     if (prevSeconds === 0)
+     {
+      
+       clearInterval(intervalId);
+       onLimit();
+     }
+   }, 1000);
+ }, []); // The empty dependency array ensures that the effect runs once when the component mounts
 
-    // Clean up the interval when the component is unmounted
-    return () => clearInterval(intervalId);
-  }, []); // The empty dependency array ensures that the effect runs once when the component mounts
+
+  
+
+   // Clean up the interval when the component is unmounted
+   //return () =>
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);
-    const remainingSeconds = timeInSeconds % 60;
+    const secondsText = timeInSeconds % 60;
 
-    const formattedMinutes = String(minutes).padStart(2, '0');
-    const formattedSeconds = String(remainingSeconds).padStart(2, '0');
-
-    return `${formattedMinutes}:${formattedSeconds}`;
+    return minutes > 0 ? `${minutes}:${String(secondsText).padStart(2, '0')}` : String(secondsText);
   };
+
+
 
   return (
     <View style={styles.container}>
-      { (seconds < limit) && <Text style={styles.timerText}>{formatTime(seconds)}</Text> }
-      { (seconds >= limit) && <Text style={styles.timerText}>Times up!</Text>}
+      { (prevSeconds > 0) && <Text style={styles.timerText}>{formatTime(prevSeconds)}</Text> }
+      { (prevSeconds === 0) && <Text style={styles.timerText}>Times up!</Text>}
     </View>
   );
 };
@@ -45,7 +54,7 @@ const styles = StyleSheet.create({
   timerText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: "white",
+    color: 'white',
   },
 });
 
