@@ -156,14 +156,14 @@ async function addGame(hostId, code) {
     };
 
     // gameTable.push(gameState);
-    let user = await db.ref(`/user/${hostId}`).once('value').val;
+    let user = (await db.ref(`/user/${hostId}`).once('value')).val();
     let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [{hostId}] };
     await db.ref(`/mission/${code}`).set(mission);
 
     await db.ref(`/mission-party/${code}`).push({
         id: hostId,
         name: user.name,
-        photoURL: user.photoURL
+        photoURL: user.photoURL ?? user.picture
     });
     
     //await db.ref(`/mission-hackers/${code}`).set([]);
@@ -239,7 +239,7 @@ async function joinGame(code, uid) {
     }
 
 
-    let user = await db.ref(`/user/${uid}`).once('value').val;
+    let user = (await db.ref(`/user/${uid}`).once('value')).val();
 
     //join the party if you've not already joined
     await db.ref(`/mission-party/${code}`).push({
