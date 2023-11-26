@@ -12,7 +12,7 @@ import { GameContext } from '../services/gameState';
 
 export default function JoinGame({ navigation }) {
 
-  const {game, setGame} = useContext(GameContext);
+  const { game, setGame } = useContext(GameContext);
   const [sessions, setSessions] = useState([]);
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
@@ -37,8 +37,7 @@ export default function JoinGame({ navigation }) {
 
   handleJoin = (item) => {
     missionJoin(game.idToken, item.code).then(joinMissionResult => {
-      if (joinMissionResult.error)
-      {
+      if (joinMissionResult.error) {
         console.log("Join Failed.", joinMissionResult.error);
         return;
       }
@@ -46,13 +45,13 @@ export default function JoinGame({ navigation }) {
 
       setGame({
         ...game,
-        mission : item,
+        mission: item,
         code: item.code,
 
 
       });
-  
-      navigation.navigate("GameScreen", {code: item.code});
+
+      navigation.navigate("GameScreen", { code: item.code });
     });
   }
 
@@ -61,21 +60,25 @@ export default function JoinGame({ navigation }) {
     //console.log("Session: ", item);
 
     return (
-      <TouchableOpacity onPress={() => handleJoin(item)}>
-        <Text style={styles.missionText}>{item.code} ({Object.keys(item.party).length} / 5)</Text>
-      </TouchableOpacity>
+      <>
+        {item &&
+          <TouchableOpacity onPress={() => handleJoin(item)}>
+            <Text style={styles.missionText}>{item.code} ({item && item.party ?  Object.keys(item.party).length : 1} / 5)</Text>
+          </TouchableOpacity>
+        }
+      </>
     )
   };
 
   return (
     <View style={styles.container}>
-     
+
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text style={styles.text}>Join Game</Text>
         <Text style={styles.missionText}>{sessionLength} total missions online</Text>
         {sessions.length > 0 &&
           <FlatList
-            data={sessions}
+            data={sessions?.filter((i) => i != null) ?? []}
             renderItem={_renderItem}
             keyExtractor={item => item.code}
           ></FlatList>

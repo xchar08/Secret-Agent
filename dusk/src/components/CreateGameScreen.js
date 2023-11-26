@@ -25,15 +25,15 @@ export default function CreateGame({ navigation }) {
         console.log(missionResult.error);
         return;
       }
-
+      console.log('missionResult', missionResult.payload);
       setGame({
         ...game,
         code,
         mission: missionResult.payload
       })
-      
+      navigation.navigate('GameScreen', { code });
     });
-    navigation.navigate('GameScreen', { code })
+    
 
   };
 

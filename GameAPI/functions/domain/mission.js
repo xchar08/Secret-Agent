@@ -245,7 +245,7 @@ async function joinGame(code, uid) {
 
     //join the party if you've not already joined
     await db.ref(`/mission-party/${code}`).push({
-        id: user.id,
+        id: uid,
         name: user.name,
         photoURL: user.photoURL
     });

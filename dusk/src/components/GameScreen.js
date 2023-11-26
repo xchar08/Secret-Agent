@@ -72,7 +72,9 @@ export default function GameLobby({ navigation, route }) {
         console.log("meow", snapshot.val());
         if (snapshot.val() != null) {
           setPhaseKey(snapshot.val().current_phase);
-
+          if (snapshot.val().current_phase != phasekey) {
+            setGame({...game, mission: snapshot.val()});
+          }
         }
 
 
@@ -89,11 +91,7 @@ export default function GameLobby({ navigation, route }) {
         }
       });
 
-    const thirdReference = FIREBASE_DATABASE.ref(`/mission/${game.code}`)
-      .once('value').then(value => {
-        console.log("hello", value);
-      })
-
+ 
     return () => {
       FIREBASE_DATABASE.ref(`/mission/${game.code}`).off('value', reference);
       FIREBASE_DATABASE.ref(`/mission-party/${game.code}`).off('child_added', secondReference);
@@ -109,7 +107,12 @@ export default function GameLobby({ navigation, route }) {
     missionAdvance(game.idToken, game.code).then((mission) => {
       console.log("Advancing", mission);
       //setPhaseKey(PHASE_TALK);
-      game.mission = mission.payload;
+      if (mission.payload != null) {
+        game.mission = mission.payload;
+        setGame(game);
+      }
+      
+      
     });
   };
 
@@ -142,7 +145,7 @@ export default function GameLobby({ navigation, route }) {
       setRound(game.mission?.round_number ?? 0); //dynamic round count
       setCode(game.code);
       setIsHost(game.isHost);
-      setPlayers((game && game.mission && game.mission.party) ? Object.values(game.mission.party) : [
+      setPlayers((mission.payload) ? Object.values(mission.payload.party) : [
         { id: 1, name: 'Player 1' },
         { id: 2, name: 'Player 2' },
         { id: 3, name: 'Player 3' },

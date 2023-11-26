@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const Timer = ({limit, onLimit}) => {
-  console.log("Limit: ", limit);
+  //console.log("Limit: ", limit);
   const [prevSeconds, setPrevSeconds] = useState(limit); // Initial seconds value for countdown
   //let prevSeconds = limit;
 
