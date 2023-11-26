@@ -3,24 +3,21 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const Timer = ({limit, onLimit}) => {
   console.log("Limit: ", limit);
-  //const [prevSeconds, setPrevSeconds] = useState(limit); // Initial seconds value for countdown
-  let prevSeconds = limit;
+  const [prevSeconds, setPrevSeconds] = useState(limit); // Initial seconds value for countdown
+  //let prevSeconds = limit;
 
   useEffect(() => {
   //  console.log("Mounted: ", prevSeconds);
-  const intervalId = setInterval(() => {
 
-    // if (prevSeconds === 0) return;
-     prevSeconds = prevSeconds - 1;
-     
-     if (prevSeconds === 0)
-     {
-      
-       clearInterval(intervalId);
-       onLimit();
-     }
+  if (prevSeconds === 0) {
+    onLimit();
+    return;
+  }
+  const intervalId = setInterval(() => {
+    setPrevSeconds(prevSeconds - 1);
    }, 1000);
- }, []); // The empty dependency array ensures that the effect runs once when the component mounts
+   return () => clearInterval(intervalId);
+ }, [prevSeconds]); // The empty dependency array ensures that the effect runs once when the component mounts
 
 
   

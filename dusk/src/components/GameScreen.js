@@ -29,28 +29,41 @@ const missionApp = await firebase.initializeApp({
   databaseURL: options.databaseURL
 
 }, "missionApp");
+
+let gameState = {
+  idToken: null,
+  code: null,
+  isHost: null,
+  profile: null,
+  mission: null
+}
+
 */
 
 export default function GameLobby({ navigation, route }) {
 
   const FIREBASE_DATABASE = databaseProvider.database();
   const { game, setGame } = useContext(GameContext);
+
+
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
   const [playersJoined, setPlayersJoined] = useState(1);
   const { gameID } = route.params;
-  const [round, setRound] = useState(2); //dynamic round count
-  const [code, setCode] = useState(game.code);
-  const [isHost, setIsHost] = useState(game.isHost);
-  const [players, setPlayers] = useState(game.party ? Object.values(game.party) : [
+  const [round, setRound] = useState(game?.mission?.round_number ?? 0); //dynamic round count
+  const [code, setCode] = useState(game?.code);
+  const [isHost, setIsHost] = useState(game?.isHost);
+  const [players, setPlayers] = useState((game && game.mission && game.mission?.party) ? Object.values(game.mission.party) : [
     { id: 1, name: 'Player 1' },
     { id: 2, name: 'Player 2' },
     { id: 3, name: 'Player 3' },
     { id: 4, name: 'Player 4' },
     { id: 5, name: 'Player 5' },
   ]);
-  const [circleStatus, setCirclStatus] = useState(game.nodes ? game.nodes.filter(node => node != null) : Array(5).fill(false));
 
 
+  const [circleStatus, setCirclStatus] = useState(Array(5).fill(false));
+
+  console.log("HOLLER BACK", game.mission,  round, code, isHost, players, circleStatus);
 
   useEffect(() => {
     const reference = FIREBASE_DATABASE
@@ -59,6 +72,7 @@ export default function GameLobby({ navigation, route }) {
         console.log("meow", snapshot.val());
         if (snapshot.val() != null) {
           setPhaseKey(snapshot.val().current_phase);
+          
         }
 
 
@@ -125,10 +139,10 @@ export default function GameLobby({ navigation, route }) {
     missionAdvance(game.idToken, game.code).then((mission) => {
       setPhaseKey(PHASE_TEAM_VOTE);
       game.mission = mission.payload;
-      setRound(game.mission.round_number); //dynamic round count
+      setRound(game.mission?.round_number ?? 0); //dynamic round count
       setCode(game.code);
       setIsHost(game.isHost);
-      setPlayers(game.party ? Object.values(game.party) : [
+      setPlayers((game && game.mission && game.mission.party) ? Object.values(game.mission.party) : [
         { id: 1, name: 'Player 1' },
         { id: 2, name: 'Player 2' },
         { id: 3, name: 'Player 3' },

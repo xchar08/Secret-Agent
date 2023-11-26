@@ -5,7 +5,7 @@ import Timer from './Timer';
 import { GameContext } from '../services/gameState';
 
 
-export default function TeamVotePhase({round, isHost, players, circleStatus, onSubmitTeam, code}) {
+export default function TeamVotePhase({ round, isHost, players, circleStatus, onSubmitTeam, code }) {
     const { game, setGame } = useContext(GameContext);
     console.log("game:", game);
     const [playersSelected, setPlayersSelected] = useState([]);
@@ -16,6 +16,8 @@ export default function TeamVotePhase({round, isHost, players, circleStatus, onS
 
     console.log("circleStatus: ", circleStatus);
     console.log("players", players);
+
+
     console.log("isHost", isHost);
     console.log("code", code);
     console.log("round", round);
@@ -37,7 +39,7 @@ export default function TeamVotePhase({round, isHost, players, circleStatus, onS
                 </View>
 
                 <View style={styles.mainBox}>
-                    <View style={styles.hexagonContainer}>
+                    {players && <View style={styles.hexagonContainer}>
                         {players.map((player) => (
                             <TouchableOpacity
                                 key={player.id}
@@ -47,7 +49,7 @@ export default function TeamVotePhase({round, isHost, players, circleStatus, onS
                                 <Text style={styles.playerName}>{player.name}</Text>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </View>}
                     <View>
                         <TouchableOpacity
                             style={styles.submitButton}
@@ -59,7 +61,7 @@ export default function TeamVotePhase({round, isHost, players, circleStatus, onS
                 </View>
 
 
-                <View style={styles.bottomBox}>
+                {circleStatus && <View style={styles.bottomBox}>
                     {circleStatus.map((isGreen, index) => (
                         <TouchableOpacity
                             key={index}
@@ -67,7 +69,7 @@ export default function TeamVotePhase({round, isHost, players, circleStatus, onS
                             onPress={() => handlePress(index)}
                         />
                     ))}
-                </View>
+                </View>}
                 <StatusBar style="auto" />
             </ImageBackground>
         </View>
