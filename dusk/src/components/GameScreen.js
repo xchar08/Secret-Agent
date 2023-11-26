@@ -63,7 +63,7 @@ export default function GameLobby({ navigation, route }) {
 
   const [circleStatus, setCirclStatus] = useState(Array(5).fill(false));
 
-  console.log("HOLLER BACK", game.mission,  round, code, isHost, players, circleStatus);
+  console.log("HOLLER BACK", game.mission, round, code, isHost, players, circleStatus);
 
   useEffect(() => {
     const reference = FIREBASE_DATABASE
@@ -72,7 +72,7 @@ export default function GameLobby({ navigation, route }) {
         console.log("meow", snapshot.val());
         if (snapshot.val() != null) {
           setPhaseKey(snapshot.val().current_phase);
-          
+
         }
 
 
@@ -177,24 +177,44 @@ export default function GameLobby({ navigation, route }) {
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-        <Text>GameId: {game.code}</Text>
-        {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} partySize={playersJoined} />}
-        {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
-        {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase
-          onEnd={handleTeamVoteEnd}
-          onSubmitTeam={handleSubmitTeam}
-          circleStatus={circleStatus}
-          round={round}
-          players={players}
-          isHost={isHost}
-          code={code} />
-        }
+        <View style={styles.headerBox}>
+          <View>
+            <Text style={styles.roundText}>{`Round ${round}`}</Text>
+          </View>
+          <View style={styles.bar}>
+            <Text style={styles.headerText}>{`Game ID: ${code}`}</Text>
+            <Timer style={styles.timer}></Timer>
+            <Text style={styles.headerText}>{`Your Role: ${(isHost) ? "Host" : "Participant"}`}</Text>
+          </View>
+        </View>
+        <View style={styles.mainBox}>
+          {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} game={game} partySize={playersJoined} />}
+          {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
+          {phasekey === PHASE_TEAM_VOTE && <TeamVotePhase
+            onEnd={handleTeamVoteEnd}
+            onSubmitTeam={handleSubmitTeam}
+            circleStatus={circleStatus}
+            round={round}
+            players={players}
+            isHost={isHost}
+            code={code} />
+          }
 
-        {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
-        {phasekey === PHASE_NODE_VOTE && <NodeVotePhase onEnd={handleNodeVoteEnd} />}
-        {phasekey === PHASE_OUTCOME && <OutcomePhase />}
-        {phasekey === PHASE_COMPLETE && <CompletePhase />}
-        <StatusBar style="auto" />
+          {phasekey === PHASE_TEAM_REVOTE && <TeamVotePhase onEnd={handleTeamVoteEnd} />}
+          {phasekey === PHASE_NODE_VOTE && <NodeVotePhase onEnd={handleNodeVoteEnd} />}
+          {phasekey === PHASE_OUTCOME && <OutcomePhase />}
+          {phasekey === PHASE_COMPLETE && <CompletePhase />}
+        </View>
+        {circleStatus && <View style={styles.bottomBox}>
+          {circleStatus.map((isGreen, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[styles.circle, { backgroundColor: isGreen ? 'green' : 'red' }]}
+              onPress={() => handlePress(index)}
+            />
+          ))}
+        </View>}
+
       </ImageBackground>
     </View>
   )

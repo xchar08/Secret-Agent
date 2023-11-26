@@ -5,25 +5,25 @@ import Timer from './Timer';
 import { GameContext } from '../services/gameState';
 import { missionAdvance } from '../services/api.service';
 
-export default function ChatPhase({onEnd}) {
-    const {game, setGame} = useContext(GameContext);
+export default function ChatPhase({ onEnd }) {
+    const { game, setGame } = useContext(GameContext);
 
     const handleTimeLimit = () => {
         console.log("Time Limit Advance: ", game.code, game.idToken);
         onEnd();
-       
+
     }
 
     return (
-        <View style={styles.container}>
-            <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-                <Timer style={styles.timer} limit={20} onLimit={handleTimeLimit}></Timer>
-                <View style={styles.backDrop}>
-                    <Text style={styles.text}> Discuss anything during this phase.  The next phase will pick a team that will determine the fate of this round's node.</Text>
+        <View>
+            
+            <View style={styles.backDrop}>
+            <Timer style={styles.timer} limit={20} onLimit={handleTimeLimit}></Timer>
+                <Text style={styles.text}> Discuss anything during this phase.  The next phase will pick a team that will determine the fate of this round's node.</Text>
 
-                    <StatusBar style="auto" />
-                </View>
-            </ImageBackground>
+                <StatusBar style="auto" />
+            </View>
+
         </View>
     )
 

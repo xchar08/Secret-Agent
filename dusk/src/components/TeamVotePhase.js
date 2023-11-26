@@ -24,54 +24,37 @@ export default function TeamVotePhase({ round, isHost, players, circleStatus, on
 
     return (
 
-        <View style={styles.container}>
-            <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
+        <View >
+           
 
-                <View style={styles.headerBox}>
-                    <View>
-                        <Text style={styles.roundText}>{`Round ${round}`}</Text>
-                    </View>
-                    <View style={styles.bar}>
-                        <Text style={styles.headerText}>{`Game ID: ${code}`}</Text>
-                        <Timer style={styles.timer}></Timer>
-                        <Text style={styles.headerText}>{`Your Role: ${(isHost) ? "Host" : "Participant"}`}</Text>
-                    </View>
-                </View>
 
-                <View style={styles.mainBox}>
-                    {players && <View style={styles.hexagonContainer}>
-                        {players.map((player) => (
-                            <TouchableOpacity
-                                key={player.id}
-                                style={styles.hexagonSlice}
-                                onPress={() => handlePlayerPress(player)}
-                            >
-                                <Text style={styles.playerName}>{player.name}</Text>
-                            </TouchableOpacity>
-                        ))}
-                    </View>}
-                    <View>
+
+
+                {players && <View style={styles.hexagonContainer}>
+                    {players.map((player) => (
                         <TouchableOpacity
-                            style={styles.submitButton}
-                            onPress={() => onSubmitTeam(playersSelected)}
+                            key={player.id}
+                            style={styles.hexagonSlice}
+                            onPress={() => handlePlayerPress(player)}
                         >
-                            <Text style={styles.blackText}>Submit Team Proposal</Text>
+                            <Text style={styles.playerName}>{player.name}</Text>
                         </TouchableOpacity>
-                    </View>
-                </View>
-
-
-                {circleStatus && <View style={styles.bottomBox}>
-                    {circleStatus.map((isGreen, index) => (
-                        <TouchableOpacity
-                            key={index}
-                            style={[styles.circle, { backgroundColor: isGreen ? 'green' : 'red' }]}
-                            onPress={() => handlePress(index)}
-                        />
                     ))}
                 </View>}
+                <View>
+                    <TouchableOpacity
+                        style={styles.submitButton}
+                        onPress={() => onSubmitTeam(playersSelected)}
+                    >
+                        <Text style={styles.blackText}>Submit Team Proposal</Text>
+                    </TouchableOpacity>
+                </View>
+
+
+
+
                 <StatusBar style="auto" />
-            </ImageBackground>
+          
         </View>
 
     )
@@ -82,6 +65,23 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         marginTop: StatusBar.currentHeight,
+    },
+    headerBox: {
+        flex: 1,
+        alignItems: 'center',
+    },
+    mainBox: {
+        flex: 3,
+        flexDirection: 'vertical',
+        backgroundColor: 'white', //Intentionally overwrites the parent container's background color
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    bottomBox: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     image: {
         height: '100%',
@@ -111,6 +111,23 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         backgroundColor: 'white',
     },
+    bar: {
+        flex: 1,
+        flexDirection: 'row',
+        justifyContent: 'center', // Center content horizontally
+        alignItems: 'center', // Center content vertically
+        padding: 10,
+    },
+    roundText: {
+        fontStyle: 'italic',
+        fontSize: 30,
+        color: 'white',
+    },
+    headerText: {
+        fontStyle: 'italic',
+        fontSize: 15,
+        color: 'white',
+    },
     buttonText: {
         color: 'darkblue',
         fontSize: 18,
@@ -120,6 +137,45 @@ const styles = StyleSheet.create({
     timer: {
         //alignSelf: 'top', doesnt work
     },
-
+    circle: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        marginHorizontal: 10,
+    },
+    hexagonContainer: {
+        flexDirection: 'vertical',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    hexagonSlice: {
+        width: 200,
+        height: 58,
+        backgroundColor: '#3248a8',
+        margin: 2,
+        borderRadius: 100,
+        overflow: 'hidden',
+        position: 'relative',
+    },
+    playerName: {
+        textAlign: 'center',
+        color: 'white',
+        margin: 10,
+    },
+    submitButton: {
+        width: 300,
+        height: 40,
+        backgroundColor: 'white',
+        margin: 1,
+        borderRadius: 100,
+        borderColor: '#3248a8',
+        borderWidth: 2,
+    },
+    blackText: {
+        textAlign: 'center',
+        color: '#3248a8',
+        fontSize: 20,
+        margin: 5,
+    }
 
 })

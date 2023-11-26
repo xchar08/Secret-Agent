@@ -8,25 +8,20 @@ import { GameContext } from '../services/gameState';
 export default function NotStartedPhase({ onStart, game, partySize }) {
 
     const [isHost, setIsHost] = useState(game.isHost);
-   
+
     return (
-        <View style={styles.container}>
-            <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-                <View style={styles.backDrop}>
-                    <Text style={styles.text}>Welcome to Purgatory</Text>
-                    <Text style={styles.text}> ({partySize} / 5)</Text>
-                    {
-                        isHost && 
-                        <TouchableOpacity onPress={onStart} style={styles.button}>
-                            <Text style={styles.text}>Start Game</Text>
-                        </TouchableOpacity>
-                    }
-                    {
-                        !isHost && <Text style={styles.text}>Waiting on host start.</Text>
-                    }
-                </View>
-                <StatusBar style="auto" />
-            </ImageBackground>
+        <View style={styles.backDrop}>
+            <Text style={styles.text}>Pre Game Lobby</Text>
+            <Text style={styles.text}> ({partySize} / 5)</Text>
+            {
+                isHost &&
+                <TouchableOpacity onPress={onStart} style={styles.button}>
+                    <Text style={styles.text}>Start Game</Text>
+                </TouchableOpacity>
+            }
+            {
+                !isHost && <Text style={styles.text}>Waiting on host start.</Text>
+            }
         </View>
     )
 

@@ -156,12 +156,16 @@ async function addGame(hostId, code) {
     };
 
     // gameTable.push(gameState);
-
+    let user = await db.ref(`/user/${hostId}`).once('value').val;
     let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [{hostId}] };
     await db.ref(`/mission/${code}`).set(mission);
-    await db.ref(`/mission-party/${code}`).push(hostId).then((value) => {
-        console.log(value);
+
+    await db.ref(`/mission-party/${code}`).push({
+        id: hostId,
+        name: user.name,
+        photoURL: user.photoURL
     });
+    
     //await db.ref(`/mission-hackers/${code}`).set([]);
     await db.ref(`/mission-nodes/${code}/1`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/2`).set({ state: NODE_STATE_OPEN });
@@ -234,8 +238,15 @@ async function joinGame(code, uid) {
         throw Error("You've already joined this game.");
     }
 
+
+    let user = await db.ref(`/user/${uid}`).once('value').val;
+
     //join the party if you've not already joined
-    await db.ref(`/mission-party/${code}`).push(uid);
+    await db.ref(`/mission-party/${code}`).push({
+        id: user.id,
+        name: user.name,
+        photoURL: user.photoURL
+    });
 
     //update the log
     await db.ref(`/mission-log/${code}`).push({
