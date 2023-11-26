@@ -247,7 +247,7 @@ async function joinGame(code, uid) {
     await db.ref(`/mission-party/${code}`).push({
         id: uid,
         name: user.name,
-        photoURL: user.photoURL
+        photoURL: user.photoURL ?? user.picture
     });
 
     //update the log
