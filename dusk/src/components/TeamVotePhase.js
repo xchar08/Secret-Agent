@@ -5,56 +5,66 @@ import Timer from './Timer';
 import { GameContext } from '../services/gameState';
 
 
-export default function TeamVotePhase({ round, isHost, players, circleStatus, onSubmitTeam, code }) {
+export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, teamSubmitted, proposedTeam, onSubmitVote /**Team submitted parameter here */ /**create a on submit vote handler similar to onSubmitTeam */ /**proposedTeam parameter here */ }) {
     const { game, setGame } = useContext(GameContext);
-    console.log("game:", game);
-    const [playersSelected, setPlayersSelected] = useState([]);
+    console.log("team vote mission", mission);
 
+
+    //const selectedPlayers = players.map((player) => ({ ...player, selected: false }));
+    const [selectedPlayers, setSelectedPlayers] = useState((players) ? players.map((player) => ({ ...player, selected: false })) : []);
     function handlePlayerPress(player) {
-        setPlayersSelected([...playersSelected, player]);
+
+        if ((player.selected) || (!player.selected && selectedPlayers.filter(p => p.selected).length < 3)) {
+            player.selected = !player.selected;
+
+            setSelectedPlayers([...selectedPlayers.filter(p => p.id != player.id), player]);
+        }
     }
 
-    console.log("circleStatus: ", circleStatus);
     console.log("players", players);
-
-
     console.log("isHost", isHost);
-    console.log("code", code);
-    console.log("round", round);
 
     return (
 
         <View >
-           
+            {!isHost && <View>
+                <Text>Vote on this Round's Team Proposal</Text>
+                {teamSubmitted && proposedTeam.map((player) => (
 
+                    <Text key={player.id}
+                        style={(player.selected) ? styles.selectedPlayerName : styles.playerName}>{player.name}</Text>
 
+                ))
+                /** create a template here for  displaying the players if and only if the team submitted is true*/}
 
+                {/** create the vote buttons here yay or nay etc. */}
 
-                {players && <View style={styles.hexagonContainer}>
-                    {players.map((player) => (
-                        <TouchableOpacity
-                            key={player.id}
-                            style={styles.hexagonSlice}
-                            onPress={() => handlePlayerPress(player)}
-                        >
-                            <Text style={styles.playerName}>{player.name}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>}
-                <View>
+            </View>}
+            {players && isHost && <View style={styles.hexagonContainer}>
+                {selectedPlayers.map((player) => (
                     <TouchableOpacity
-                        style={styles.submitButton}
-                        onPress={() => onSubmitTeam(playersSelected)}
+                        key={player.id}
+                        style={(player.selected) ? styles.selectedHexagonSlice : styles.hexagonSlice}
+                        onPress={() => handlePlayerPress(player)}
                     >
-                        <Text style={styles.blackText}>Submit Team Proposal</Text>
+                        <Text style={(player.selected) ? styles.selectedPlayerName : styles.playerName}>{player.name}</Text>
                     </TouchableOpacity>
-                </View>
+                ))}
+            </View>}
+            <View>
+                <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={() => onSubmitTeam(selectedPlayers.filter(p => p.selected))}
+                >
+                    <Text style={styles.blackText}>Submit Team Proposal</Text>
+                </TouchableOpacity>
+            </View>
 
 
 
 
-                <StatusBar style="auto" />
-          
+            <StatusBar style="auto" />
+
         </View>
 
     )
@@ -89,6 +99,11 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         resizeMode: 'stretch',
+    },
+    selectedPlayerName: {
+        textAlign: 'center',
+        color: 'green',
+        margin: 10,
     },
     text: {
         color: 'white',
@@ -147,6 +162,15 @@ const styles = StyleSheet.create({
         flexDirection: 'vertical',
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    selectedHexagonSlice: {
+        width: 200,
+        height: 58,
+        backgroundColor: '#000',
+        margin: 2,
+        borderRadius: 100,
+        overflow: 'hidden',
+        position: 'relative',
     },
     hexagonSlice: {
         width: 200,

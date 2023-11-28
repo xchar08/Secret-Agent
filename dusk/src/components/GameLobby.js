@@ -16,6 +16,11 @@ const FIREBASE_AUTH = authProvider.auth();
 export default function GameLobby({ navigation }) {
   const { game, setGame } = useContext(GameContext);
   const image = game.profile?.picture ?? game.profile?.photoURL;
+
+  if (image === null)
+  {
+    navigation.navigate("LoginPage")
+  }
   // console.log("game:", game);
   const [sessions, setSessions] = useState([]);
   const [didStart, setDidStart] = useState(false);

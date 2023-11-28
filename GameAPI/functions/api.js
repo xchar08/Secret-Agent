@@ -77,7 +77,7 @@ app.get('/mission/debug', async (req, res) => {
     res.send({payload: await mission.debug(), error: null});
 });
 
-app.get('/mission/:id', async (req, res) => {
+app.get('/mission/:code', async (req, res) => {
     let idToken = req.headers['authorization'];
     const code = req.params.code;
     try {
@@ -134,6 +134,51 @@ app.post('/mission/:code/round/advance', async (req, res) => {
     }
     catch(e)
     {
+        console.log(e.stack);
+        res.status(500).send({"payload": null, "error":e.message});
+    }
+});
+
+app.post('/mission/:code/propose-team/:round', async (req,res) => {
+    const code = req.params.code;
+    const round = req.params.round;
+    let idToken = req.headers['authorization'];
+    let uid = NOT_FOUND;
+    let players = req.body;
+    console.log("[propose team params extracted: ", { code, idToken, round, players });
+    try {
+        uid = await session.getUid(idToken);
+    }
+    catch (e) {
+        res.send({"payload": null, "error": "session/bad-id-token"});
+    }
+    try{
+        let result = await mission.proposeTeam(uid, code, round, players);
+        res.send({"payload": result, "error": null});
+    }
+    catch (e) {
+        console.log(e.stack);
+        res.status(500).send({"payload": null, "error":e.message});
+    }
+})
+app.get('/mission/:code/propose-team/:round', async (req,res) => {
+    const code = req.params.code;
+    const round = req.params.round;
+    let idToken = req.headers['authorization'];
+    let uid = NOT_FOUND;
+    let players = req.body;
+    console.log("[propose team params extracted: ", { code, idToken, round, players });
+    try {
+        uid = await session.getUid(idToken);
+    }
+    catch (e) {
+        res.send({"payload": null, "error": "session/bad-id-token"});
+    }
+    try{
+        let payload = await mission.getProposedTeam(uid, code, round);
+        res.status(500).send({"payload": payload, "error": null});
+    }
+    catch (e) {
         console.log(e.stack);
         res.status(500).send({"payload": null, "error":e.message});
     }

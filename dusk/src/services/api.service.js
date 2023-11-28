@@ -81,6 +81,9 @@ async function missionNew(idToken, code){
     return await postData(`${baseURL}/mission/new`, {code}, idToken);  
 }
 
+async function getMission(idToken, code){
+  return await getData(`${baseURL}/mission/${code}`, idToken); 
+}
 /**
  * Mission Join the user joins a lobby from a given code
  * @param {*} idToken  This is the id token issued from firebase authentication after the user signs in with google
@@ -98,7 +101,12 @@ async function missionDebug() {
 async function missionAdvance(idToken, code) {
   return await postData(`${baseURL}/mission/${code}/round/advance`, null, idToken);
 }
-
+async function missionProposeTeam(idToken, code, round_number, players) {
+  return await postData(`${baseURL}/mission/${code}/propose-team/${round_number}`, players, idToken);
+}
+async function missionGetProposedTeam(idToken, code, round_number, players) {
+  return await getData(`${baseURL}/mission/${code}/propose-team/${round_number}`,idToken);
+}
 async function getData(url = "", authToken = "")
 {
   const response = await fetch(url, {
@@ -154,6 +162,9 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.missionJoin = missionJoin;
   exports.missionDebug = missionDebug;
   exports.missionAdvance = missionAdvance;
+  exports.missionProposeTeam = missionProposeTeam;
+  exports.getMission = getMission;
+  exports.missionGetProposedTeam = missionGetProposedTeam;
 
   exports.PHASE_NOT_STARTED = PHASE_NOT_STARTED;
   exports.PHASE_TALK = PHASE_TALK;

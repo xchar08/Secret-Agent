@@ -6,6 +6,7 @@ const MISSION_PARTY_NOT_READY = "mission/party_not_ready";
 const MIN_HACK_WIN_VOTE = 1;
 const PARTY_SIZE = 2;   //change this to 5 later
 const MISSION_NOTFOUND = "mission/not_found";
+const MISSION_INVALID_TEAM_PROPOSAL_LENGTH = "mission/invalid_team_proposal_length";
 
 const NOTFOUND = null;
 const PARTY_INDEX_NOT_FOUND = -1;
@@ -315,9 +316,9 @@ async function get(hostId, code) {
 
     let missionEnriched = {
         ...mission,
-        party: (await db.ref(`/mission-party/${code}`).once('value')).val(),
-        nodes: (await db.ref(`/mission-nodes/${code}`).once('value')).val(),
-        rounds: (await db.ref(`/mission-rounds/${code}`).once('value')).val()
+        party: Object.values((await db.ref(`/mission-party/${code}`).once('value')).val()),
+        nodes: Object.values((await db.ref(`/mission-nodes/${code}`).once('value')).val()),
+        rounds: Object.values((await db.ref(`/mission-rounds/${code}`).once('value')).val())
     }
     return missionEnriched
 
@@ -471,8 +472,26 @@ async function voteNode(code, uid, vote) {
 async function getNodeVote(code) {
 
 }
+async function proposeTeam(uid, code, round, players){
+    if (players.length != 3){
+        throw new Error(MISSION_INVALID_TEAM_PROPOSAL_LENGTH);
+    }
 
+    await db.ref(`/mission-proposed-team/${code}/${round}`).set({players});
+    await db.ref(`/mission-rounds/${code}/${round}/is_proposed`).set(true);
 
+    await db.ref(`/mission-log/${code}`).push({
+        userId: uid,
+        action: "Proposed Team.",
+        time: new Date()
+    });
+
+    return players;
+}
+async function getProposedTeam(uid, code,round){
+   return Object.values((await db.ref(`/mission-proposed-team/${code}/${round}`).once('value')).val())[0];
+    
+}
 exports.new = addGame;
 exports.debug = gameData;
 exports.join = joinGame;
@@ -484,3 +503,5 @@ exports.voteTeam = voteTeam;
 exports.getTeamVote = getTeamVote;
 exports.voteNode = voteNode;
 exports.getNodeVote = getNodeVote;
+exports.proposeTeam = proposeTeam;
+exports.getProposedTeam = getProposedTeam;

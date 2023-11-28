@@ -1,8 +1,3 @@
-
-import {
-  StyleSheet,
-} from 'react-native';
-
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './src/components/LoginPage'
@@ -15,17 +10,7 @@ import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
 
-import firebase from '@react-native-firebase/app';
 import {firebase as authProvider} from '@react-native-firebase/auth';
-
-
-
-//import { FIREBASE_AUTH } from './src/environments/config';
-/*
-databaseProvider.database();
-authProvider.auth();
-*/
-
 import { GameContext } from './src/services/gameState';
 
 let gameState = {
@@ -58,21 +43,8 @@ const GameNavigator = () => (
 );
 
 export default function App() {
-  let options = {
-    apiKey: "AIzaSyAW5OxWzEVtm9EyPJHkaiO3yTZarFAXrEA",
-    authDomain: "cse3310-game.firebaseapp.com",
-    databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com",
-    projectId: "cse3310-game",
-    storageBucket: "cse3310-game.appspot.com",
-    messagingSenderId: "739597303932",
-    appId: "1:739597303932:web:3cb760a5849478110009f9"
-  }
   
-  /*auth.onAuthStateChanged((user)=>{
-   console.log(user); 
-  });
-*/
-
+  
   //initialize the game state when the app loads,
   // and other screens will pull this context to update 
   //the various fields on the gamestate over time.
@@ -81,7 +53,7 @@ export default function App() {
 
   useEffect(() => {
 
-   // const firebaseApp = firebase.initializeApp(options).then(() => {
+  
       const FIREBASE_AUTH = authProvider.auth();
 
       FIREBASE_AUTH.onAuthStateChanged((user) => {
@@ -90,7 +62,7 @@ export default function App() {
         
       })
   
-  //  });
+ 
     
   
   }, []);
@@ -108,11 +80,3 @@ export default function App() {
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

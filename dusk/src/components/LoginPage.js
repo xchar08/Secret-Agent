@@ -70,7 +70,7 @@ export default function LoginPage({ navigation }) {
 
       const token = await firebaseUser.user.getIdToken();
 
-
+      
       console.log(token);
       const userProfile = await sessionStart(token);
       //console.log(userProfile);
