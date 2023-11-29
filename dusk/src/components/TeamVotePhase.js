@@ -3,9 +3,10 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 import { GameContext } from '../services/gameState';
+import { NODE_VOTE_N, NODE_VOTE_Y } from '../services/api.service';
 
 
-export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, teamSubmitted, proposedTeam, onSubmitVote /**Team submitted parameter here */ /**create a on submit vote handler similar to onSubmitTeam */ /**proposedTeam parameter here */ }) {
+export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, teamSubmitted, proposedTeam, onSubmitVote }) {
     const { game, setGame } = useContext(GameContext);
     console.log("team vote mission", mission);
 
@@ -19,6 +20,12 @@ export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, 
 
             setSelectedPlayers([...selectedPlayers.filter(p => p.id != player.id), player]);
         }
+    }
+
+    const handleTimeLimit = () => {
+        
+        onSubmitVote(null);
+    
     }
 
     console.log("players", players);
@@ -35,30 +42,50 @@ export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, 
                         style={(player.selected) ? styles.selectedPlayerName : styles.playerName}>{player.name}</Text>
 
                 ))
-                /** create a template here for  displaying the players if and only if the team submitted is true*/}
+                }
 
-                {/** create the vote buttons here yay or nay etc. */}
-
-            </View>}
-            {players && isHost && <View style={styles.hexagonContainer}>
-                {selectedPlayers.map((player) => (
+                {
+                    teamSubmitted && <>
                     <TouchableOpacity
-                        key={player.id}
-                        style={(player.selected) ? styles.selectedHexagonSlice : styles.hexagonSlice}
-                        onPress={() => handlePlayerPress(player)}
-                    >
-                        <Text style={(player.selected) ? styles.selectedPlayerName : styles.playerName}>{player.name}</Text>
-                    </TouchableOpacity>
-                ))}
+                            style={styles.submitButton}
+                            onPress={() => onSubmitVote(NODE_VOTE_Y)}
+                        >
+                            <Text style={styles.blackText}>Approve</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={styles.submitButton}
+                            onPress={() => onSubmitVote(NODE_VOTE_N)}
+                        >
+                            <Text style={styles.blackText}>Reject</Text>
+                        </TouchableOpacity>
+                    </>
+                
+                }
+
             </View>}
-            <View>
-                <TouchableOpacity
-                    style={styles.submitButton}
-                    onPress={() => onSubmitTeam(selectedPlayers.filter(p => p.selected))}
-                >
-                    <Text style={styles.blackText}>Submit Team Proposal</Text>
-                </TouchableOpacity>
-            </View>
+            {players && isHost &&
+                <><Timer style={styles.timer} limit={60} onLimit={handleTimeLimit}></Timer>
+                    <View style={styles.hexagonContainer}>
+                        {selectedPlayers.map((player) => (
+                            <TouchableOpacity
+                                key={player.id}
+                                style={(player.selected) ? styles.selectedHexagonSlice : styles.hexagonSlice}
+                                onPress={() => handlePlayerPress(player)}
+                            >
+                                <Text style={(player.selected) ? styles.selectedPlayerName : styles.playerName}>{player.name}</Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                    <View>
+                        <TouchableOpacity
+                            style={styles.submitButton}
+                            onPress={() => onSubmitTeam(selectedPlayers.filter(p => p.selected))}
+                        >
+                            <Text style={styles.blackText}>Submit Team Proposal</Text>
+                        </TouchableOpacity>
+                    </View>
+                </>}
+
 
 
 

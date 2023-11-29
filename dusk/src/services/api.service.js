@@ -107,6 +107,9 @@ async function missionProposeTeam(idToken, code, round_number, players) {
 async function missionGetProposedTeam(idToken, code, round_number, players) {
   return await getData(`${baseURL}/mission/${code}/propose-team/${round_number}`,idToken);
 }
+async function missionVoteTeam(idToken, code, round_number, vote) {
+  return await postData(`${baseURL}/mission/${code}/${round_number}`, vote, idToken);
+}
 async function getData(url = "", authToken = "")
 {
   const response = await fetch(url, {
@@ -165,6 +168,7 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.missionProposeTeam = missionProposeTeam;
   exports.getMission = getMission;
   exports.missionGetProposedTeam = missionGetProposedTeam;
+  exports.missionVoteTeam = missionVoteTeam;
 
   exports.PHASE_NOT_STARTED = PHASE_NOT_STARTED;
   exports.PHASE_TALK = PHASE_TALK;
@@ -173,3 +177,5 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.PHASE_NODE_VOTE = PHASE_NODE_VOTE
   exports.PHASE_OUTCOME = PHASE_OUTCOME
   exports.PHASE_COMPLETE = PHASE_COMPLETE
+  exports.NODE_VOTE_Y = NODE_VOTE_Y;
+  exports.NODE_VOTE_N = NODE_VOTE_N;

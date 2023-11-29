@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 import { GameContext } from '../services/gameState';
-import { PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, getMission, missionAdvance, missionProposeTeam, missionGetProposedTeam } from '../services/api.service';
+import { PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, getMission, missionAdvance, missionProposeTeam, missionGetProposedTeam, missionVoteTeam } from '../services/api.service';
 import ChatPhase from './ChatPhase';
 import NotStartedPhase from './NotStartedPhase';
 import TeamVotePhase from './TeamVotePhase';
@@ -12,6 +12,7 @@ import OutcomePhase from './OutcomePhase';
 import CompletePhase from './CompletePhase';
 
 import { firebase as databaseProvider } from '@react-native-firebase/database';
+
 
 
 export default function GameLobby({ navigation, route }) {
@@ -25,10 +26,17 @@ export default function GameLobby({ navigation, route }) {
   const [nodes, setNodes] = useState([]);
   const [teamSubmitted, setTeamSubmitted] = useState(false);
   const [proposedTeam, setProposedTeam] = useState([]);
-  const code = mission.code;
+  const [isChosen, setIsChosen] = useState(false);
+  
+    const code = mission?.code ?? game.code;
+    if (mission === null)
+    {
+      console.log("GROWL", game);
+    }
+  
+  
   const isHost = game.isHost;
-  //create a new state that is called teamSubmitted and set it's initial value to false.  useState(false) pattern here
-  //create a new state that is called proposedTeam and set it's initial value to [], useState([]) pattern here
+  
 
   console.log("HOLLER BACK", mission, code, isHost, game);
 
@@ -39,11 +47,18 @@ export default function GameLobby({ navigation, route }) {
         console.log("meow", mission);
         if (mission && mission.current_phase != phasekey) {
 
-            getMission(game.idToken, game.code).then(missionData => {
+          getMission(game.idToken, game.code).then(missionData => {
             setMission(missionData.payload);
             setPhaseKey(missionData.payload.current_phase);
             setRound(missionData.payload.round_number ?? 0); //dynamic round count 
             setNodes(missionData.payload.nodes);
+            
+            if(proposedTeam && proposedTeam.filter(pt => pt.id === game.profile.uid).length > 0){
+                setIsChosen(true);
+            }
+
+           
+            
           });
 
         }
@@ -65,19 +80,19 @@ export default function GameLobby({ navigation, route }) {
           ]);*/
         }
       });
-      const thirdReference = FIREBASE_DATABASE
+    const thirdReference = FIREBASE_DATABASE
       .ref(`/mission-proposed-team/${code}/${round}`).on('value', (snapshot) => {
         console.log('howl', snapshot.val());
-        missionGetProposedTeam(game.idToken,code,round).then(teamData =>{
+        missionGetProposedTeam(game.idToken, code, round).then(teamData => {
           console.log('chirp', teamData.payload);
           setProposedTeam(teamData.payload);
           setTeamSubmitted(snapshot.val());
-          
+
         });
-          
-        
+
+
       });
-      
+
 
 
     return () => {
@@ -135,16 +150,30 @@ export default function GameLobby({ navigation, route }) {
   const handleSubmitTeam = (team) => {
     console.log("Handle Submit Team");
     missionProposeTeam(game.idToken, game.code, round, team).then((playersPayload) => {
-      console.log('ribbit', playersPayload);
-      
+      console.log('ribbit', playersPayload, game);
+      missionAdvance(game.idToken, game.code).then((mission) => {
+        setMission(mission.payload);
+  
+  
+  
+        console.log("chat ended", mission);
+      });
 
     });
   }
 
-  const handleTeamVoteEnd = () => {
-    missionAdvance(game.idToken, game.code).then((mission) => {
-      setPhaseKey(PHASE_NODE_VOTE);
-      game.mission = mission.payload;
+  const handleTeamVoteEnd = (vote) => {
+
+    if (vote === null) {
+      missionAdvance(game.idToken, game.code).then((mission) => {
+        setPhaseKey(PHASE_NODE_VOTE);
+        game.mission = mission.payload;
+
+      });
+      return;
+    }
+    missionVoteTeam(game.idToken, game.code, round, vote).then(voteResult=> {
+        console.log('moo', voteResult);
     });
   }
 
@@ -178,16 +207,16 @@ export default function GameLobby({ navigation, route }) {
             onSubmitTeam={handleSubmitTeam}
             mission={mission}
             players={party}
-            isHost={isHost} 
+            isHost={isHost}
             teamSubmitted={teamSubmitted}
             onSubmitVote={handleTeamVoteEnd}
             proposedTeam={proposedTeam}
-            
-            />
+
+          />
           }
 
-         
-          {phasekey === PHASE_NODE_VOTE && <NodeVotePhase onEnd={handleNodeVoteEnd} />}
+
+          {phasekey === PHASE_NODE_VOTE && <NodeVotePhase isChosen={isChosen} onSubmitVote={handleNodeVoteEnd}/>}
           {phasekey === PHASE_OUTCOME && <OutcomePhase />}
           {phasekey === PHASE_COMPLETE && <CompletePhase />}
         </View>

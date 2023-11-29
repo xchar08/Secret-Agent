@@ -168,7 +168,7 @@ async function addGame(hostId, code) {
     await db.ref(`/mission/${code}`).set(mission);
 
     await db.ref(`/mission-party/${code}`).push(hostUser);
-    
+
     //await db.ref(`/mission-hackers/${code}`).set([]);
     await db.ref(`/mission-nodes/${code}/1`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/2`).set({ state: NODE_STATE_OPEN });
@@ -339,8 +339,7 @@ async function advanceRound(hostId, code) {
         currentParty = Object.values(missionPartyObject);
         console.log(currentParty);
     }
-    else
-    {
+    else {
         currentParty = [];
     }
     if (currentParty.length < PARTY_SIZE) {
@@ -359,30 +358,30 @@ async function advanceRound(hostId, code) {
                 let round = (await db.ref(`/mission-rounds/${code}/${mission.round_number}`).once('value')).val();
                 await db.ref(`/mission-rounds/${code}/${mission.round_number}`).set({ ...round, round_host: currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET] });
                 mission.round_host = currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET];
-                await db.ref(`/mission/${code}`).set({...mission, current_phase : PHASE_TALK});
+                await db.ref(`/mission/${code}`).set({ ...mission, current_phase: PHASE_TALK });
             }
             break;
         case PHASE_TALK:
             {
                 mission.current_phase = PHASE_TEAM_VOTE;
-                await db.ref(`/mission/${code}`).set({...mission, current_phase : PHASE_TEAM_VOTE});
+                await db.ref(`/mission/${code}`).set({ ...mission, current_phase: PHASE_TEAM_VOTE });
             }
             break;
         case PHASE_TEAM_REVOTE:
         case PHASE_TEAM_VOTE:
             {
-                let votes = (await db.ref(`/mission/${code}/mission-rounds-proposed-team/${mission.round}`).once('value')).val();
+                //let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-proposed-team/${mission.round}`).once('value')).val());
 
-                if (votes === null || votes.filter(v => v.ballot === NODE_VOTE_Y).length() < 3) {
+                /*if (votes === null || votes.filter(v => v.ballot === NODE_VOTE_Y).length() < 3) {
                     //nays have it
                     mission.current_phase = PHASE_TEAM_REVOTE;
                 }
-                else {
+               { else*/
+                console.log('hoot', code, mission);
+                mission.current_phase = PHASE_NODE_VOTE;
+                //}
+                await db.ref(`/mission/${code}`).set({ ...mission });
 
-                    mission.current_phase = PHASE_NODE_VOTE;
-                }
-                await db.ref(`/mission/${code}`).set({...mission});
-                
             }
             break;
         case PHASE_NODE_VOTE:
@@ -401,7 +400,7 @@ async function advanceRound(hostId, code) {
 
                 }
                 mission.current_phase = PHASE_OUTCOME;
-                await db.ref(`/mission/${code}`).set({...mission});
+                await db.ref(`/mission/${code}`).set({ ...mission });
             }
             break;
         case PHASE_OUTCOME:
@@ -412,7 +411,7 @@ async function advanceRound(hostId, code) {
                 else {
                     mission.current_phase = PHASE_COMPLETE;
                 }
-                await db.ref(`/mission/${code}`).set({...mission});
+                await db.ref(`/mission/${code}`).set({ ...mission });
             }
             break;
         default:
@@ -441,43 +440,51 @@ async function getChat(code) {
 }
 
 
-async function voteTeam(code, uid, vote) {
+async function voteTeam(code, uid, round, vote) {
+
+    await db.ref(`/mission/${code}/mission-rounds-proposed-team/${round}`).push({ ballot: vote });
     //update the log
     await db.ref(`/mission-log/${code}`).push({
         userId: uid,
-        action: "Joined Game.",
+        action: "Voted Proposed Team.",
         time: new Date()
     });
+
+    return vote;
 }
 
 
 
 async function getTeamVote(code) {
-
+    let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-proposed-team/${round}`).once('value')).val());
+    return votes;
 }
 
 
 
-async function voteNode(code, uid, vote) {
+async function voteNode(code, uid, round, vote) {
+    //update the log
+    await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).push({ ballot: vote });
     //update the log
     await db.ref(`/mission-log/${code}`).push({
         userId: uid,
-        action: "Joined Game.",
+        action: "Voted Proposed Team.",
         time: new Date()
     });
+
+    return vote;
 }
 
-
-
-async function getNodeVote(code) {
-
+async function getNodeVote(code, round) {
+    let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-proposed-team/${round}`).once('value')).val());
+    return votes;
 }
-async function proposeTeam(uid, code, round, players){
-    if (players.length != 3){
+async function proposeTeam(uid, code, round, players) {
+    if (players.length != 3) {
         throw new Error(MISSION_INVALID_TEAM_PROPOSAL_LENGTH);
     }
 
-    await db.ref(`/mission-proposed-team/${code}/${round}`).set({players});
+    await db.ref(`/mission-proposed-team/${code}/${round}`).set({ players });
     await db.ref(`/mission-rounds/${code}/${round}/is_proposed`).set(true);
 
     await db.ref(`/mission-log/${code}`).push({
@@ -488,9 +495,9 @@ async function proposeTeam(uid, code, round, players){
 
     return players;
 }
-async function getProposedTeam(uid, code,round){
-   return Object.values((await db.ref(`/mission-proposed-team/${code}/${round}`).once('value')).val())[0];
-    
+async function getProposedTeam(uid, code, round) {
+    return Object.values((await db.ref(`/mission-proposed-team/${code}/${round}`).once('value')).val())[0];
+
 }
 exports.new = addGame;
 exports.debug = gameData;
