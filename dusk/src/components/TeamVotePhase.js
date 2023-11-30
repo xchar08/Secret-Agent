@@ -1,13 +1,15 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
-import Timer from './Timer';
-import { GameContext } from '../services/gameState';
+import { AuthContext, HostContext, MissionContext, CodeContext } from '../services/gameState';
 import { NODE_VOTE_N, NODE_VOTE_Y } from '../services/api.service';
 
 
-export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, teamSubmitted, proposedTeam, onSubmitVote }) {
-    const { game, setGame } = useContext(GameContext);
+export default function TeamVotePhase({players, onSubmitTeam, teamSubmitted, proposedTeam, onSubmitVote }) {
+    const { user, setUser } = useContext(AuthContext);
+    const { code, setCode } = useContext(CodeContext);
+    const { host, setHost } = useContext(HostContext);
+    const { mission, setMission } = useContext(MissionContext);
     console.log("team vote mission", mission);
 
 
@@ -29,13 +31,13 @@ export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, 
     }
 
     console.log("players", players);
-    console.log("isHost", isHost);
+    console.log("isHost", host);
 
     return (
 
         <View >
-            {!isHost && <View>
-                <Text>Vote on this Round's Team Proposal</Text>
+            {!host && <View>
+                <Text>Please Wait for the Host</Text>
                 {teamSubmitted && proposedTeam.map((player) => (
 
                     <Text key={player.id}
@@ -63,8 +65,8 @@ export default function TeamVotePhase({ mission, isHost, players, onSubmitTeam, 
                 }
 
             </View>}
-            {players && isHost &&
-                <><Timer style={styles.timer} limit={60} onLimit={handleTimeLimit}></Timer>
+            {host &&
+                <>
                     <View style={styles.hexagonContainer}>
                         {selectedPlayers.map((player) => (
                             <TouchableOpacity

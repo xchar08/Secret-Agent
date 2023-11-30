@@ -11,3 +11,4 @@ admin.initializeApp({
 const db = admin.database();
 
 exports.db = db;
+//how we grant admin access to our database

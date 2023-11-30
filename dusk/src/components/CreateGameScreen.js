@@ -3,7 +3,8 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import {missionNew} from '../services/api.service';
 
-import {GameContext} from '../services/gameState';
+import {AuthContext, CodeContext, MissionContext} from '../services/gameState';
+
 
 const makeGameID = (length) => {
   let id = '';
@@ -15,23 +16,25 @@ const makeGameID = (length) => {
 };
 
 export default function CreateGame({ navigation }) {
-  const {game, setGame} = useContext(GameContext);
-  const [code, setCode] = useState(makeGameID(4));
+  const {user, setUser} = useContext(AuthContext);
+  const {code, setCode} = useContext(CodeContext);
+  const {mission, setMission} = useContext(MissionContext);
+  
+  const [tempCode, setTempCode] = useState(makeGameID(4));
+ 
+ // const [code, setCode] = useState();
 
   const handleCreateGameButtonPress = () => {
 
-    missionNew(game.idToken, code).then(missionResult => {
+    missionNew(user.idToken, tempCode).then(missionResult => {
       if (missionResult.error) {
         console.log(missionResult.error);
         return;
       }
       console.log('missionResult', missionResult.payload);
-      setGame({
-        ...game,
-        code,
-        mission: missionResult.payload
-      })
-      navigation.navigate('GameScreen', { code });
+      setCode(tempCode);
+      setMission(missionResult.payload);
+      navigation.navigate('GameScreen');
     });
     
 
@@ -43,7 +46,7 @@ export default function CreateGame({ navigation }) {
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text style={styles.text}>Create Game</Text>
 
-        <Text style={styles.text}>Game Join Id: {code}</Text>
+        <Text style={styles.text}>Game Join Id: {tempCode}</Text>
         <TouchableOpacity
           style={[styles.GameLobbyButton]}
           onPress={handleCreateGameButtonPress}

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity, Image, Button } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import { sessionDebug } from '../services/api.service';
-import { GameContext } from '../services/gameState';
+import { AuthContext, HostContext } from '../services/gameState';
 
 //import { FIREBASE_AUTH } from '../environments/config';
 
@@ -14,8 +14,10 @@ const FIREBASE_AUTH = authProvider.auth();
 
 
 export default function GameLobby({ navigation }) {
-  const { game, setGame } = useContext(GameContext);
-  const image = game.profile?.picture ?? game.profile?.photoURL;
+  const {user, setUser} = useContext(AuthContext);
+  const {host, setHost} = useContext(HostContext);
+
+  const image = user.profile?.picture ?? user.profile?.photoURL;
 
   if (image === null)
   {
@@ -43,12 +45,12 @@ export default function GameLobby({ navigation }) {
 
 
   const handleCreateGame = () => {
-    setGame({ ...game, isHost: true });
+    setHost(true);
     navigation.navigate('CreateGame');
   };
 
   const handleJoinGame = () => {
-    setGame({ ...game, isHost: false });
+    setHost(false);
     navigation.navigate('JoinGame');
   };
 
@@ -59,7 +61,7 @@ export default function GameLobby({ navigation }) {
         <Text style={styles.text}>Secret Message</Text>
 
         {image && <Image source={{ uri: image }} style={styles.profileImage} />}
-        { game.profile?.name !== null && <Text style={styles.userName}>Welcome {game.profile?.name}</Text>}
+        { user.profile?.name !== null && <Text style={styles.userName}>Welcome {user.profile?.name}</Text>}
         <TouchableOpacity style={styles.GameLobbyButton} onPress={handleCreateGame}
           color="#841584"
         >

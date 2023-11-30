@@ -1,5 +1,6 @@
 const uuid = require('uuid');
 const { db } = require('./db.js');
+//const { missionAdvance } = require('../../../dusk/src/services/api.service.js');
 
 const ROUND_HOST_INDEX_OFFSET = 1;
 const MISSION_PARTY_NOT_READY = "mission/party_not_ready";
@@ -47,6 +48,9 @@ const ROUND_FOUR = 4;
 const ROUND_FIVE = 5;
 
 const NOT_SET = -1;
+
+//module of functions that coordinate a game session
+
 async function addGame(hostId, code) {
 
     //adding a new game session
@@ -464,19 +468,32 @@ async function getTeamVote(code) {
 
 async function voteNode(code, uid, round, vote) {
     //update the log
-    await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).push({ ballot: vote });
+    await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).push(vote);
     //update the log
     await db.ref(`/mission-log/${code}`).push({
         userId: uid,
         action: "Voted Proposed Team.",
         time: new Date()
     });
+    let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).once('value')).val());
+    if ((votes.length === 3) || (votes.filter(v => v.ballot === NODE_VOTE_N).length > 0)) {
+        advanceRound(null, code);
+        return vote;
+    }
 
     return vote;
 }
 
 async function getNodeVote(code, round) {
-    let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-proposed-team/${round}`).once('value')).val());
+    let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).once('value')).val());
+
+
+
+
+
+
+
+
     return votes;
 }
 async function proposeTeam(uid, code, round, players) {

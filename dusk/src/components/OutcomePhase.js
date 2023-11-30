@@ -6,12 +6,12 @@ import { GameContext } from '../services/gameState';
 
 
 export default function OutcomePhase() {
-    const game = useContext(GameContext);
+    const {game} = useContext(GameContext);
 
     return (
         <View style={styles.container}>
             <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
-                <Text>Discuss anything during this phase.  The next phase will pick a team that will determine the fate of this round's node.</Text>
+                <Text>Here Are the Results of This Round</Text>
                 <Timer style={styles.timer}></Timer>
                 <StatusBar style="auto" />
             </ImageBackground>

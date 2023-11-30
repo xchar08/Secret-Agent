@@ -2,18 +2,17 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
-import { GameContext } from '../services/gameState';
-import { missionAdvance } from '../services/api.service';
+import { CodeContext, AuthContext } from '../services/gameState';
 
 export default function ChatPhase({ onEnd }) {
-    const { game, setGame } = useContext(GameContext);
+    const { user, setUser } = useContext(AuthContext);
+    const { code, setCode } = useContext(CodeContext);
 
     const handleTimeLimit = () => {
-        console.log("Time Limit Advance: ", game.code, game.idToken);
+        console.log("Time Limit Advance: ", code, user.idToken);
         onEnd();
 
     }
-
     return (
         <View>
             

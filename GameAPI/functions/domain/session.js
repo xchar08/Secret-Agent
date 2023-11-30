@@ -4,6 +4,8 @@ const { db } = require('./db.js');
 
 const USER_NOT_FOUND = {};
 
+//module of functions (package) that coordinate data for a player session(user profile/online status/logging in and out)
+
 async function verifyToken(idToken) {
     return await getAuth().verifyIdToken(idToken);
 }

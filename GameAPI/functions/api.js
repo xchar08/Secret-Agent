@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const session = require('./domain/session.js')
 const mission = require('./domain/mission.js');
 
+//collection of functions that post or gets/requests or sends data from/to app and the database
 
 const DEBUG = false;
 const NOT_FOUND = -1;
@@ -208,7 +209,7 @@ app.get('/mission/:code/:round/team-vote', async (req, res) => {
     }
     try{
         let payload = await mission.getTeamVote(code);
-        res.status(500).send({"payload": payload, "error": null});
+        res.send({"payload": payload, "error": null});
     }
     catch (e) {
         console.log(e.stack);
@@ -241,11 +242,30 @@ app.post('/mission/:code/:round/team-vote', async (req, res) => {
     }
 });
 
-app.get('/mission/:id/round/node-vote', async (req, res) => {
-    res.send('Hello, World');
+app.get('/mission/:code/:round/node-vote', async (req, res) => {
+    const code = req.params.code;
+    const round = req.params.round;
+    let idToken = req.headers['authorization'];
+    let uid = NOT_FOUND;
+    let players = req.body;
+    console.log("[node vote params extracted: ", { code, idToken, round, players });
+    try {
+        uid = await session.getUid(idToken);
+    }
+    catch (e) {
+        res.send({"payload": null, "error": "session/bad-id-token"});
+    }
+    try{
+        let payload = await mission.getNodeVote(code);
+        res.send({"payload": payload, "error": null});
+    }
+    catch (e) {
+        console.log(e.stack);
+        res.status(500).send({"payload": null, "error":e.message});
+    }
 });
 
-app.post('/mission/:id/round/node-vote', async (req, res) => {
+app.post('/mission/:code/:round/node-vote', async (req, res) => {
     const code = req.params.code;
     const round = req.params.round;
     let idToken = req.headers['authorization'];

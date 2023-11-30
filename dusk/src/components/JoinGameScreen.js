@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import { missionDebug, missionJoin } from '../services/api.service';
-import { GameContext } from '../services/gameState';
+import { AuthContext, CodeContext, MissionContext } from '../services/gameState';
 
 
 
@@ -12,7 +12,9 @@ import { GameContext } from '../services/gameState';
 
 export default function JoinGame({ navigation }) {
 
-  const { game, setGame } = useContext(GameContext);
+  const { user, setUser } = useContext(AuthContext);
+  const { mission, setMission } = useContext(MissionContext);
+  const { code, setCode } = useContext(CodeContext);
   const [sessions, setSessions] = useState([]);
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
@@ -36,22 +38,17 @@ export default function JoinGame({ navigation }) {
   }), [])
 
   handleJoin = (item) => {
-    missionJoin(game.idToken, item.code).then(joinMissionResult => {
+    missionJoin(user.idToken, item.code).then(joinMissionResult => {
       if (joinMissionResult.error) {
         console.log("Join Failed.", joinMissionResult.error);
         return;
       }
       //console.log("MISSION JOINED", joinMissionResult.payload);
 
-      setGame({
-        ...game,
-        mission: item,
-        code: item.code,
+      setCode(item.code);
+      setMission(item);
 
-
-      });
-
-      navigation.navigate("GameScreen", { code: item.code });
+      navigation.navigate("GameScreen");
     });
   }
 

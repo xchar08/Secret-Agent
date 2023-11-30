@@ -10,16 +10,8 @@ import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
 
-import {firebase as authProvider} from '@react-native-firebase/auth';
-import { GameContext } from './src/services/gameState';
-
-let gameState = {
-  idToken: null,
-  code: null,
-  isHost: null,
-  profile: null,
-  mission: null
-}
+import { firebase as authProvider } from '@react-native-firebase/auth';
+import { AuthContext, CodeContext, HostContext, MissionContext } from './src/services/gameState';
 
 const AuthStack = createNativeStackNavigator();
 const GameStack = createNativeStackNavigator();
@@ -33,49 +25,61 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
-const GameNavigator = () => (
-  <GameStack.Navigator initialRouteName="GameLobby">
-    <GameStack.Screen name="GameLobby" component={GameLobby} />
-    <GameStack.Screen name="CreateGame" component={CreateGame} />
-    <GameStack.Screen name="JoinGame" component={JoinGame} />
-    <GameStack.Screen name="GameScreen" component={GameScreen} />
-  </GameStack.Navigator>
-);
+const GameNavigator = () => {
+  const [code, setCode] = useState(null);
+  const [host, setHost] = useState(null);
+  const [mission, setMission] = useState(null);
+
+  return (
+    <HostContext.Provider value={{ host, setHost }}>
+      <CodeContext.Provider value={{ code, setCode }}>
+        <MissionContext.Provider value={{ mission, setMission }}>
+          <GameStack.Navigator initialRouteName="GameLobby">
+            <GameStack.Screen name="GameLobby" component={GameLobby} />
+            <GameStack.Screen name="CreateGame" component={CreateGame} />
+            <GameStack.Screen name="JoinGame" component={JoinGame} />
+            <GameStack.Screen name="GameScreen" component={GameScreen} />
+          </GameStack.Navigator>
+        </MissionContext.Provider>
+      </CodeContext.Provider>
+    </HostContext.Provider>
+  )
+};
 
 export default function App() {
-  
-  
+
+
   //initialize the game state when the app loads,
   // and other screens will pull this context to update 
   //the various fields on the gamestate over time.
-  const [game, setGame] = useState(gameState);
+  //const [game, setGame] = useState(gameState);
   const [user, setUser] = useState(null);
 
   useEffect(() => {
 
-  
-      const FIREBASE_AUTH = authProvider.auth();
 
-      FIREBASE_AUTH.onAuthStateChanged((user) => {
-        console.log(user);
-        setUser(user);
-        
-      })
-  
- 
-    
-  
+    const FIREBASE_AUTH = authProvider.auth();
+
+    FIREBASE_AUTH.onAuthStateChanged((user) => {
+      console.log(user);
+      setUser(user);
+
+    })
+
+
+
+
   }, []);
 
 
   //Decide which stack navigator to call based on whether or not user is logged in
   return (
-    <GameContext.Provider value={{ game, setGame }}>
+    <AuthContext.Provider value={{ user, setUser }}>
 
       <NavigationContainer>
         {user ? <GameNavigator /> : <AuthNavigator />}
       </NavigationContainer>
-    </GameContext.Provider>
+    </AuthContext.Provider>
   );
 }
 

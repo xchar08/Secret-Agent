@@ -1,26 +1,25 @@
 import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
-import Timer from './Timer';
-import { GameContext } from '../services/gameState';
+import { HostContext } from '../services/gameState';
 
 
-export default function NotStartedPhase({ onStart, game, partySize }) {
+export default function NotStartedPhase({ onStart, partySize }) {
 
-    const [isHost, setIsHost] = useState(game.isHost);
+    const {host, setHost} = useContext(HostContext);
 
     return (
         <View style={styles.backDrop}>
             <Text style={styles.text}>Pre Game Lobby</Text>
             <Text style={styles.text}> ({partySize} / 5)</Text>
             {
-                isHost &&
+                host &&
                 <TouchableOpacity onPress={onStart} style={styles.button}>
                     <Text style={styles.text}>Start Game</Text>
                 </TouchableOpacity>
             }
             {
-                !isHost && <Text style={styles.text}>Waiting on host start.</Text>
+                !host && <Text style={styles.text}>Waiting on host start.</Text>
             }
         </View>
     )

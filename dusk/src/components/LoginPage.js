@@ -10,7 +10,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 
 import { sessionStart } from '../services/api.service';
-import { GameContext } from '../services/gameState';
+import { AuthContext } from '../services/gameState';
 
 import firebase from '@react-native-firebase/app';
 import { firebase as authProvider } from '@react-native-firebase/auth';
@@ -18,7 +18,7 @@ import { firebase as authProvider } from '@react-native-firebase/auth';
 export default function LoginPage({ navigation }) {
 
 
-  const { game, setGame } = useContext(GameContext);
+  const { user, setUser } = useContext(AuthContext);
   //disable the google sign in button after clicking signin
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
 
@@ -76,10 +76,9 @@ export default function LoginPage({ navigation }) {
       //console.log(userProfile);
       setIsSigninInProgress(false);
 
-      setGame({
-        ...game,
+      setUser({
         idToken: token,
-        profile: userProfile.payLoad,
+        profile: userProfile.payLoad
       });
 
       //console.log(game);

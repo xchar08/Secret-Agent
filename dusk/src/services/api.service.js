@@ -110,6 +110,11 @@ async function missionGetProposedTeam(idToken, code, round_number, players) {
 async function missionVoteTeam(idToken, code, round_number, vote) {
   return await postData(`${baseURL}/mission/${code}/${round_number}`, vote, idToken);
 }
+async function missionNodeVote(idToken, code, round_number, vote){
+  let url = `${baseURL}/mission/${code}/${round_number}/node-vote`;
+  console.log('HISS',url);
+  return await postData(`${baseURL}/mission/${code}/${round_number}/node-vote`, vote, idToken);
+}
 async function getData(url = "", authToken = "")
 {
   const response = await fetch(url, {
@@ -169,6 +174,7 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.getMission = getMission;
   exports.missionGetProposedTeam = missionGetProposedTeam;
   exports.missionVoteTeam = missionVoteTeam;
+  exports.missionNodeVote = missionNodeVote;
 
   exports.PHASE_NOT_STARTED = PHASE_NOT_STARTED;
   exports.PHASE_TALK = PHASE_TALK;

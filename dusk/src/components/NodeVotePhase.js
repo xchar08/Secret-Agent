@@ -1,15 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
-import bluebackground from '../assets/bluebackground.png';
-import Timer from './Timer';
-import { GameContext } from '../services/gameState';
 
+import { NODE_VOTE_N, NODE_VOTE_Y } from '../services/api.service';
 
 export default function NodeVotePhase({ onSubmitVote, isChosen }) {
-  const { game } = useContext(GameContext);
-  //console.log('Action Phase', mission);
-  //const [action, setAction] = useState(0);
-  //function handleActionPress(){
+  
 
 
 
