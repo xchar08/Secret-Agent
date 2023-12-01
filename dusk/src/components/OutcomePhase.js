@@ -2,12 +2,21 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
-import { GameContext } from '../services/gameState';
+import { AuthContext, CodeContext, HostContext} from '../services/gameState';
 
 
-export default function OutcomePhase() {
-    const {game} = useContext(GameContext);
+export default function OutcomePhase({onEnd}) {
+    const { user, setUser } = useContext(AuthContext);
+    const { code, setCode } = useContext(CodeContext);
+    const { host, setHost } = useContext(HostContext);
 
+    const handleTimeLimit = () => {
+        console.log("Time Limit Advance: ", code, user.idToken);
+        onEnd();
+
+        
+    }
+    
     return (
         <View style={styles.container}>
             <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
@@ -16,6 +25,7 @@ export default function OutcomePhase() {
                 <StatusBar style="auto" />
             </ImageBackground>
         </View>
+        
     )
 
 }

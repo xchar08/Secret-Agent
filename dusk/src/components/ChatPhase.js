@@ -12,6 +12,7 @@ export default function ChatPhase({ onEnd }) {
         console.log("Time Limit Advance: ", code, user.idToken);
         onEnd();
 
+        
     }
     return (
         <View>

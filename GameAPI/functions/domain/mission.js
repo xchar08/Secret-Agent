@@ -224,12 +224,12 @@ async function joinGame(code, uid) {
         throw Error(MISSION_NOTFOUND);
     }
 
-    console.log("Host Game", hostGame);
+   // console.log("Host Game", hostGame);
 
     //check how may players are in the party by retrieving the party
     let currentParty = Object.values((await db.ref(`/mission-party/${code}`).once('value')).val());
 
-    console.log("Players Joined: ", Object.values(currentParty).length);
+  //  console.log("Players Joined: ", Object.values(currentParty).length);
 
 
 
@@ -263,7 +263,7 @@ async function joinGame(code, uid) {
     });
 
     //debug check
-    console.log(Object.values(((await db.ref(`/mission-party/${code}`).once('value')).val())));
+  //  console.log(Object.values(((await db.ref(`/mission-party/${code}`).once('value')).val())));
 
     //retrieve the current party's latest values
     currentParty = Object.values((await db.ref(`/mission-party/${code}`).once('value')).val());
@@ -290,12 +290,12 @@ async function joinGame(code, uid) {
 async function gameData() {
 
     let missionsCodes = (await db.ref(`/mission`).once('value')).val();
-    console.log(missionsCodes);
-    console.log(Object.keys(missionsCodes));
+    //console.log(missionsCodes);
+    //console.log(Object.keys(missionsCodes));
     let enriched = [];
     let code = "";
     for (var i = 0; i < Object.keys(missionsCodes).length; i++) {
-        console.log("code:", Object.keys(missionsCodes)[i]);
+      //  console.log("code:", Object.keys(missionsCodes)[i]);
         //let mission = (await db.ref(`/mission/${code}`).once('value')).val();
 
         let code = Object.keys(missionsCodes)[i];
@@ -338,10 +338,10 @@ async function advanceRound(hostId, code) {
     }
 
     const missionPartyObject = (await db.ref(`/mission-party/${code}`).once('value')).val();
-    console.log("mission party", code, missionPartyObject);
+    console.log("advancing code", code);
     if (missionPartyObject) {
         currentParty = Object.values(missionPartyObject);
-        console.log(currentParty);
+        //console.log(currentParty);
     }
     else {
         currentParty = [];
@@ -381,7 +381,7 @@ async function advanceRound(hostId, code) {
                     mission.current_phase = PHASE_TEAM_REVOTE;
                 }
                { else*/
-                console.log('hoot', code, mission);
+                //console.log('hoot', code, mission);
                 mission.current_phase = PHASE_NODE_VOTE;
                 //}
                 await db.ref(`/mission/${code}`).set({ ...mission });
@@ -390,17 +390,28 @@ async function advanceRound(hostId, code) {
             break;
         case PHASE_NODE_VOTE:
             {
-                let votes = (await db.ref(`/mission/${code}/mission-rounds-node-vote/${mission.round}`).once('value')).val();
 
-
-                //let defaultSecureVotes = 5 - votes.length;
-                //nays have it
-                let node = (await (db.ref(`/mission-nodes/${code}/${mission.round}`).once('value'))).val();
-                if ((votes.filter(v => v.ballot === HACK_VOTE).length() >= MIN_HACK_WIN_VOTE)) {
-                    await db.ref(`/mission-nodes/${code}/${mission.round}`).set({ ...node, state: NODE_STATE_HACKED });
+                let key = `/mission/${code}/mission-rounds-node-vote/${mission.round_number}`;
+                console.log("Key: ", key);
+                let votes = (await db.ref(key).once('value')).val();
+                console.log('VOTES', votes);
+                if (votes === null) {
+                    console.log("Votes were null");
+                    break;
                 }
                 else {
-                    await db.ref(`/mission-nodes/${code}/${mission.round}`).set({ ...node, state: NODE_STATE_SECURED });
+                    console.log("Vote shape: ", votes);
+                    //normalize the shape
+                    votes = Object.values(votes);
+                }
+                //let defaultSecureVotes = 5 - votes.length;
+                //nays have it
+                let node = (await (db.ref(`/mission-nodes/${code}/${mission.round_number}`).once('value'))).val();
+                if ((votes.filter(v => v.ballot === NODE_VOTE_N).length >= MIN_HACK_WIN_VOTE)) {
+                    await db.ref(`/mission-nodes/${code}/${mission.round_number}`).set({ ...node, state: NODE_STATE_HACKED });
+                }
+                else {
+                    await db.ref(`/mission-nodes/${code}/${mission.round_number}`).set({ ...node, state: NODE_STATE_SECURED });
 
                 }
                 mission.current_phase = PHASE_OUTCOME;
@@ -409,7 +420,7 @@ async function advanceRound(hostId, code) {
             break;
         case PHASE_OUTCOME:
             {
-                if (mission.round < 5) {
+                if (mission.round_number < 5) {
                     mission.current_phase = PHASE_NOT_STARTED;
                 }
                 else {
@@ -422,7 +433,7 @@ async function advanceRound(hostId, code) {
             break;
     }
 
-    console.log(mission);
+    //console.log(mission);
     return await get(hostId, code);
 
 
@@ -444,7 +455,7 @@ async function getChat(code) {
 }
 
 
-async function voteTeam(code, uid, round, vote) {
+async function voteTeam(uid, code, round, vote) {
 
     await db.ref(`/mission/${code}/mission-rounds-proposed-team/${round}`).push({ ballot: vote });
     //update the log
@@ -466,7 +477,9 @@ async function getTeamVote(code) {
 
 
 
-async function voteNode(code, uid, round, vote) {
+async function voteNode(uid, code, round, vote) {
+
+    console.log("Node vote params: ", code, uid, round, vote);
     //update the log
     await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).push(vote);
     //update the log
@@ -477,6 +490,7 @@ async function voteNode(code, uid, round, vote) {
     });
     let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-node-vote/${round}`).once('value')).val());
     if ((votes.length === 3) || (votes.filter(v => v.ballot === NODE_VOTE_N).length > 0)) {
+        console.log("Trigger round advance due to max votes or lethal vote", votes);
         advanceRound(null, code);
         return vote;
     }

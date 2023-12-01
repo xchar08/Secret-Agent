@@ -99,7 +99,9 @@ async function missionDebug() {
 }
 
 async function missionAdvance(idToken, code) {
-  return await postData(`${baseURL}/mission/${code}/round/advance`, null, idToken);
+  let url = `${baseURL}/mission/${code}/round/advance`;
+  console.log("Advancing:: ", url);
+  return await postData(url, null, idToken);
 }
 async function missionProposeTeam(idToken, code, round_number, players) {
   return await postData(`${baseURL}/mission/${code}/propose-team/${round_number}`, players, idToken);

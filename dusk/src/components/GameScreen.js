@@ -55,7 +55,8 @@ export default function GameLobby({ navigation, route }) {
         console.log("BARK", snapshot.val());
 
 
-        if (snapshot.val() != null) {
+        if (snapshot.val() != null && party.length !== 5) {
+          console.log('SET PARTY', code, host, Object.values(snapshot.val()), mission.party);
           setParty(Object.values(snapshot.val()));
           /*setPlayers((mission.payload) ? Object.values(mission.payload.party) : [
             { id: 1, name: 'Player 1' },
@@ -93,16 +94,16 @@ export default function GameLobby({ navigation, route }) {
   const hostHandleStart = () => {
     console.log("HANDLE START PRESSED");
     // setPhaseKey(PHASE_TALK);
-    missionAdvance(user.idToken, code).then((missionResult) => {
-      console.log("ADVANCING", missionResult);
-      //setPhaseKey(PHASE_TALK);
-      if (missionResult.payload != null) {
+    if (host) {
+      missionAdvance(user.idToken, code).then((missionResult) => {
+        console.log("ADVANCING", missionResult);
+        //setPhaseKey(PHASE_TALK);
+        if (missionResult.payload != null) {
 
-        setMission(missionResult.payload);
-      }
-
-
-    });
+          setMission(missionResult.payload);
+        }
+      });
+    }
   };
 
 
@@ -113,46 +114,54 @@ export default function GameLobby({ navigation, route }) {
     //setnodes(newnodes);
   }
   const handleChatEnd = () => {
-    missionAdvance(user.idToken, code).then((missionResult) => {
-      if (missionResult.payload) {
-        setMission(missionResult.payload);
-      }
+    console.log('CHAT BEGIN', user, code, host, mission);
+    if (host) {
+      missionAdvance(user.idToken, code).then((missionResult) => {
+        if (missionResult.payload) {
+          setMission(missionResult.payload);
+        }
 
+        console.log("CHAT ENDED", code, host, missionResult);
+      });
+    }
 
-
-      console.log("CHAT ENDED", missionResult);
-    });
   };
 
   const handleSubmitTeam = (team) => {
     console.log("HANDLE SUBMIT TEAM");
     missionProposeTeam(user.idToken, code, round, team).then((playersPayload) => {
       console.log('RIBBIT', playersPayload);
-      missionAdvance(user.idToken, code).then((missionResult) => {
-        setMission(missionResult.payload);
+      if (host) {
+        missionAdvance(user.idToken, code).then((missionResult) => {
+          setMission(missionResult.payload);
 
 
 
-        console.log("SUBMIT TEAM", missionResult);
-      });
-
+          console.log("SUBMIT TEAM", missionResult);
+        });
+      }
     });
   }
 
   const handleTeamVoteEnd = (vote) => {
 
+    //if the host's timer triggers before users vote
     if (vote === null) {
-      missionAdvance(user.idToken, code).then((missionResult) => {
-        //setPhaseKey(PHASE_NODE_VOTE);
-        setMission(missionResult.payload);
+      if (host) {
+        missionAdvance(user.idToken, code).then((missionResult) => {
+          //setPhaseKey(PHASE_NODE_VOTE);
+          setMission(missionResult.payload);
 
-      });
+        });
 
-      return;
+        return;
+      }
     }
+
     missionVoteTeam(user.idToken, code, round, vote).then(voteResult => {
       console.log('MOO', voteResult);
     });
+
   }
 
   const handleNodeVoteEnd = (vote) => {

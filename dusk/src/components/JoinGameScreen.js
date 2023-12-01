@@ -4,12 +4,6 @@ import bluebackground from '../assets/bluebackground.png';
 import { missionDebug, missionJoin } from '../services/api.service';
 import { AuthContext, CodeContext, MissionContext } from '../services/gameState';
 
-
-
-
-
-
-
 export default function JoinGame({ navigation }) {
 
   const { user, setUser } = useContext(AuthContext);
