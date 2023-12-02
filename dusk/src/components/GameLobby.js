@@ -21,7 +21,7 @@ export default function GameLobby({ navigation }) {
 
   if (image === null)
   {
-    navigation.navigate("LoginPage")
+    FIREBASE_AUTH.signOut();
   }
   // console.log("game:", game);
   const [sessions, setSessions] = useState([]);

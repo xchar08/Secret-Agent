@@ -3,7 +3,10 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
 import { AuthContext, CodeContext, MissionContext, HostContext } from '../services/gameState';
-import { PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, getMission, missionAdvance, missionProposeTeam, missionGetProposedTeam, missionVoteTeam, missionNodeVote } from '../services/api.service';
+import { 
+  PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, 
+  NODE_VOTE_N, NODE_VOTE_Y, NODE_STATE_OPEN, NODE_STATE_SECURED, NODE_STATE_HACKED,
+  getMission, missionAdvance, missionProposeTeam, missionGetProposedTeam, missionVoteTeam, missionNodeVote } from '../services/api.service';
 import ChatPhase from './ChatPhase';
 import NotStartedPhase from './NotStartedPhase';
 import TeamVotePhase from './TeamVotePhase';
@@ -38,19 +41,40 @@ export default function GameLobby({ navigation, route }) {
             setMission(missionData.payload);
             setRound(missionData.payload.round_number ?? 0); //dynamic round count 
             setNodes(missionData.payload.nodes);
+           // setParty(missionData.party);
             console.log("NEIGH", user.profile.uid, proposedTeam ? proposedTeam.map(pt => pt.id) : []);
+
             if (proposedTeam && proposedTeam.filter(pt => pt.id === user.profile.uid).length > 0) {
               setIsChosen(true);
             }
 
+            //host change happens during this step
+            if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 1) {
+              const currentRound = missionData.payload.rounds[missionData.payload.round_number - 1];
+              if (user.profile.uid === currentRound.round_host.id) {
+                //setHost(true);
+              }
 
+              //reset the game state
+              //setParty([]);
+              //setTeamSubmitted(false);
+              //setProposedTeam([]);
+              //setIsChosen(false);
+              
+
+
+            }
+
+            //do this part last
             setPhaseKey(missionData.payload.current_phase);
+
+            
           });
 
         }
       });
 
-    const secondReference = FIREBASE_DATABASE
+      const secondReference = FIREBASE_DATABASE
       .ref(`/mission-party/${code}`).on('value', (snapshot) => {
         console.log("BARK", snapshot.val());
 
@@ -74,7 +98,7 @@ export default function GameLobby({ navigation, route }) {
           missionGetProposedTeam(user.idToken, code, round).then(teamData => {
             console.log('CHIRP', teamData.payload);
             setProposedTeam(teamData.payload);
-            setTeamSubmitted(snapshot.val());
+            setTeamSubmitted(true);
 
           });
         }
@@ -177,7 +201,19 @@ export default function GameLobby({ navigation, route }) {
 
   }
 
-
+  /**
+   * handle Outcome phase end needs to be added here
+   * it needs to call missionAdvance but only if the user is the host.  
+   */
+  const handleOutcomePhaseEnd = () => {
+    if (host)
+    {
+      missionAdvance(user.idToken, code).then(missionResult => 
+        {
+          setMission(missionResult.payload);
+        });
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -210,14 +246,14 @@ export default function GameLobby({ navigation, route }) {
 
 
           {phasekey === PHASE_NODE_VOTE && <NodeVotePhase isChosen={isChosen} onSubmitVote={handleNodeVoteEnd} />}
-          {phasekey === PHASE_OUTCOME && <OutcomePhase />}
+          {phasekey === PHASE_OUTCOME && <OutcomePhase node={nodes[round - 1]} onEnd={handleOutcomePhaseEnd}/*onEnd needs to be set to handleOutcomePhaseEnd */ />}
           {phasekey === PHASE_COMPLETE && <CompletePhase />}
         </View>
         {nodes && <View style={styles.bottomBox}>
-          {nodes.map((isGreen, index) => (
+          {nodes.map((node, index) => (
             <TouchableOpacity
               key={index}
-              style={[styles.circle, { backgroundColor: isGreen ? 'green' : 'red' }]}
+              style={[styles.circle, { backgroundColor: node.state === NODE_STATE_OPEN ? 'blue' : node.state === NODE_STATE_SECURED ? 'green' : 'red' }]}
               onPress={() => handlePress(index)}
             />
           ))}
