@@ -4,18 +4,21 @@ import bluebackground from '../assets/bluebackground.png';
 import { HostContext } from '../services/gameState';
 
 
-export default function NotStartedPhase({ onStart, partySize }) {
+export default function NotStartedPhase({ onStart, partySize, round}) {
 
-    const {host, setHost} = useContext(HostContext);
+    const { host, setHost } = useContext(HostContext);
 
     return (
         <View style={styles.backDrop}>
-            <Text style={styles.text}>Pre Game Lobby</Text>
+            {round === 0 && <Text style={styles.text}>Pre Game Lobby</Text>}
+            {round > 0 && <Text style={styles.text}>Ready for the next round?</Text>}
             <Text style={styles.text}> ({partySize} / 5)</Text>
             {
                 host &&
                 <TouchableOpacity onPress={onStart} style={styles.button}>
-                    <Text style={styles.text}>Start Game</Text>
+                    {round === 0 && <Text style={styles.text}>Start Game</Text>}
+                    {round > 0 && <Text style={styles.text}>Ready for the next round?</Text>}
+                    
                 </TouchableOpacity>
             }
             {

@@ -52,14 +52,13 @@ export default function GameLobby({ navigation, route }) {
             if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 1) {
               const currentRound = missionData.payload.rounds[missionData.payload.round_number - 1];
               if (user.profile.uid === currentRound.round_host.id) {
-                //setHost(true);
+                setHost(true);
               }
 
               //reset the game state
-              //setParty([]);
-              //setTeamSubmitted(false);
-              //setProposedTeam([]);
-              //setIsChosen(false);
+              setTeamSubmitted(false);
+              setProposedTeam([]);
+              setIsChosen(false);
               
 
 
@@ -229,7 +228,7 @@ export default function GameLobby({ navigation, route }) {
           </View>
         </View>
         <View style={styles.mainBox}>
-          {phasekey === PHASE_NOT_STARTED && <NotStartedPhase onStart={hostHandleStart} partySize={party.length} />}
+          {phasekey === PHASE_NOT_STARTED && <NotStartedPhase round={round} onStart={hostHandleStart} partySize={party.length} />}
           {phasekey === PHASE_TALK && <ChatPhase onEnd={handleChatEnd} />}
           {(phasekey === PHASE_TEAM_VOTE || phasekey === PHASE_TEAM_REVOTE) && <TeamVotePhase
             onEnd={handleTeamVoteEnd}
