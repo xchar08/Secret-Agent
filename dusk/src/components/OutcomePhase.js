@@ -19,14 +19,14 @@ export default function OutcomePhase({ onEnd, node }) {
 
     return (
         <View>
-            <Text>The message was:</Text>
-            {node.state === NODE_STATE_SECURED && <Text>Encrypted</Text> /** Inside this block you want to put a text element that says Encrypted. */}
-            {node.state === NODE_STATE_HACKED && <Text>Intercepted</Text>/** Inside this block you want to put a text element that says Intercepted.  */}
+            <View style={styles.backDrop}>
+            <Text style={styles.text}>The message was:</Text>
+            {node.state === NODE_STATE_SECURED && <Text style={styles.text}>ENCRYPTED</Text> /** Inside this block you want to put a text element that says Encrypted. */}
+            {node.state === NODE_STATE_HACKED && <Text style={styles.text}>INTERCEPTED</Text>/** Inside this block you want to put a text element that says Intercepted.  */}
             {/** Inside this block you want to put a text element that says Time remaining before the next round. */}
             {/** added onlimit for you because it is how we move from outcome phase back to not started for the next round. */}
-            <View styles={styles.backDrop}><Timer style={styles.timer} limit={10} onLimit={onEnd}></Timer>
+            <Timer style={styles.timer} limit={5} onLimit={handleTimeLimit}></Timer>
             </View>
-            <StatusBar style="auto" />
         </View>
 
     )

@@ -185,8 +185,10 @@ async function postData(url = "", data = {}, authToken = "") {
   exports.PHASE_NODE_VOTE = PHASE_NODE_VOTE
   exports.PHASE_OUTCOME = PHASE_OUTCOME
   exports.PHASE_COMPLETE = PHASE_COMPLETE
+  
   exports.NODE_VOTE_Y = NODE_VOTE_Y;
   exports.NODE_VOTE_N = NODE_VOTE_N;
+  
   exports.NODE_STATE_HACKED = NODE_STATE_HACKED;
   exports.NODE_STATE_OPEN = NODE_STATE_OPEN;
   exports.NODE_STATE_SECURED = NODE_STATE_SECURED;

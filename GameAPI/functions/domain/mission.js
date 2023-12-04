@@ -167,7 +167,6 @@ async function addGame(hostId, code) {
         name: user.name,
         photoURL: user.photoURL ?? user.picture
     };
-
     let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [hostUser] };
     await db.ref(`/mission/${code}`).set(mission);
 
@@ -179,11 +178,13 @@ async function addGame(hostId, code) {
     await db.ref(`/mission-nodes/${code}/3`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/4`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/5`).set({ state: NODE_STATE_OPEN });
-    await db.ref(`/mission-rounds/${code}/1`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
+    await db.ref(`/mission-rounds/${code}/1`).set({ round_host: hostUser, outcome: NODE_STATE_OPEN });
     await db.ref(`/mission-rounds/${code}/2`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
     await db.ref(`/mission-rounds/${code}/3`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
     await db.ref(`/mission-rounds/${code}/4`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
     await db.ref(`/mission-rounds/${code}/5`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
+
+    
     //await db.ref(`/mission-rounds-messages/${code}/1`).set([]);
     //await db.ref(`/mission-rounds-messages/${code}/2`).set([]);
     //await db.ref(`/mission-rounds-messages/${code}/3`).set([]);
@@ -249,11 +250,14 @@ async function joinGame(code, uid) {
     let user = (await db.ref(`/user/${uid}`).once('value')).val();
 
     //join the party if you've not already joined
-    await db.ref(`/mission-party/${code}`).push({
+
+    let currUser = {
         id: uid,
         name: user.name,
         photoURL: user.photoURL ?? user.picture
-    });
+    };
+
+    await db.ref(`/mission-party/${code}`).push(currUser);
 
     //update the log
     await db.ref(`/mission-log/${code}`).push({
@@ -261,6 +265,8 @@ async function joinGame(code, uid) {
         action: "Joined Game.",
         time: new Date()
     });
+
+
 
     //debug check
   //  console.log(Object.values(((await db.ref(`/mission-party/${code}`).once('value')).val())));
@@ -360,7 +366,7 @@ async function advanceRound(hostId, code) {
                 mission.current_phase = PHASE_TALK;
 
                 let round = (await db.ref(`/mission-rounds/${code}/${mission.round_number}`).once('value')).val();
-                await db.ref(`/mission-rounds/${code}/${mission.round_number}`).set({ ...round, round_host: currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET] });
+                
                 mission.round_host = currentParty[mission.round_number - ROUND_HOST_INDEX_OFFSET];
                 await db.ref(`/mission/${code}`).set({ ...mission, current_phase: PHASE_TALK });
             }
@@ -421,6 +427,11 @@ async function advanceRound(hostId, code) {
         case PHASE_OUTCOME:
             {
                 if (mission.round_number < 5) {
+                    const round = (await db.ref(`/mission-rounds/${code}/${mission.round_number + ROUND_HOST_INDEX_OFFSET}`).once('value')).val();
+                    await db.ref(`/mission-rounds/${code}/${mission.round_number + ROUND_HOST_INDEX_OFFSET}`).set({ ...round, round_host: currentParty[mission.round_number] });
+
+
+
                     mission.current_phase = PHASE_NOT_STARTED;
                 }
                 else {

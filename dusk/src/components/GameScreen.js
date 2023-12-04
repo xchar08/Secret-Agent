@@ -49,23 +49,38 @@ export default function GameLobby({ navigation, route }) {
             }
 
             //host change happens during this step
-            if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 1) {
-              const currentRound = missionData.payload.rounds[missionData.payload.round_number - 1];
-              if (user.profile.uid === currentRound.round_host.id) {
+            if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 0) {
+              const currentRound = missionData.payload.rounds[round];
+              console.log(`HOST SET: `, currentRound, missionData.payload);
+              console.log(`HOST SET ROUND:${round} user.profile.uid === currentRound.round_host.id`, user.profile.uid, currentRound.round_host.id);
+              if (currentRound.round_host != -1 && user.profile.uid === currentRound.round_host.id) {
                 setHost(true);
               }
+              else
+              {
+                setHost(false);
+              }
+            }
 
+            if (missionData.payload.current_phase === PHASE_OUTCOME) {
               //reset the game state
               setTeamSubmitted(false);
               setProposedTeam([]);
               setIsChosen(false);
               
 
-
+ 
             }
 
             //do this part last
-            setPhaseKey(missionData.payload.current_phase);
+            if (nodes.filter(node => node.state === NODE_STATE_HACKED).length === 3 && phasekey !== PHASE_COMPLETE)
+            {
+              setPhaseKey(PHASE_COMPLETE);
+            }
+            else if (phasekey !== PHASE_COMPLETE)
+            {
+              setPhaseKey(missionData.payload.current_phase);
+            }
 
             
           });
@@ -75,11 +90,11 @@ export default function GameLobby({ navigation, route }) {
 
       const secondReference = FIREBASE_DATABASE
       .ref(`/mission-party/${code}`).on('value', (snapshot) => {
-        console.log("BARK", snapshot.val());
+        //console.log("BARK", snapshot.val());
 
 
         if (snapshot.val() != null && party.length !== 5) {
-          console.log('SET PARTY', code, host, Object.values(snapshot.val()), mission.party);
+          //console.log('SET PARTY', code, host, Object.values(snapshot.val()), mission.party);
           setParty(Object.values(snapshot.val()));
           /*setPlayers((mission.payload) ? Object.values(mission.payload.party) : [
             { id: 1, name: 'Player 1' },
@@ -92,14 +107,20 @@ export default function GameLobby({ navigation, route }) {
       });
     const thirdReference = FIREBASE_DATABASE
       .ref(`/mission-proposed-team/${code}/${round}`).on('value', (snapshot) => {
-        console.log('HOWL', snapshot.val());
+       // console.log('HOWL round:', round);
         if (snapshot.val() != null) {
           missionGetProposedTeam(user.idToken, code, round).then(teamData => {
-            console.log('CHIRP', teamData.payload);
+           // console.log('CHIRP', teamData.payload);
             setProposedTeam(teamData.payload);
             setTeamSubmitted(true);
 
           });
+        }
+        else
+        {
+         // console.log("WAIL snapshot is null");
+          setProposedTeam([]);
+          setTeamSubmitted(false);
         }
 
       });
@@ -209,6 +230,7 @@ export default function GameLobby({ navigation, route }) {
     {
       missionAdvance(user.idToken, code).then(missionResult => 
         {
+          console.log("Outcome End:", missionResult);
           setMission(missionResult.payload);
         });
     }
@@ -246,7 +268,7 @@ export default function GameLobby({ navigation, route }) {
 
           {phasekey === PHASE_NODE_VOTE && <NodeVotePhase isChosen={isChosen} onSubmitVote={handleNodeVoteEnd} />}
           {phasekey === PHASE_OUTCOME && <OutcomePhase node={nodes[round - 1]} onEnd={handleOutcomePhaseEnd}/*onEnd needs to be set to handleOutcomePhaseEnd */ />}
-          {phasekey === PHASE_COMPLETE && <CompletePhase />}
+          {phasekey === PHASE_COMPLETE && <CompletePhase nodes={nodes} />}
         </View>
         {nodes && <View style={styles.bottomBox}>
           {nodes.map((node, index) => (
