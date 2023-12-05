@@ -11,7 +11,7 @@ import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
 
 import { firebase as authProvider } from '@react-native-firebase/auth';
-import { AuthContext, CodeContext, HostContext, MissionContext } from './src/services/gameState';
+import { AuthContext, CodeContext, HostContext, MissionContext, RoleContext } from './src/services/gameState';
 
 const AuthStack = createNativeStackNavigator();
 const GameStack = createNativeStackNavigator();
@@ -29,17 +29,20 @@ const GameNavigator = () => {
   const [code, setCode] = useState(null);
   const [host, setHost] = useState(null);
   const [mission, setMission] = useState(null);
+  const [role, setRole] = useState(null);
 
   return (
     <HostContext.Provider value={{ host, setHost }}>
       <CodeContext.Provider value={{ code, setCode }}>
         <MissionContext.Provider value={{ mission, setMission }}>
-          <GameStack.Navigator initialRouteName="GameLobby">
-            <GameStack.Screen name="GameLobby" component={GameLobby} />
-            <GameStack.Screen name="CreateGame" component={CreateGame} />
-            <GameStack.Screen name="JoinGame" component={JoinGame} />
-            <GameStack.Screen name="GameScreen" component={GameScreen} />
-          </GameStack.Navigator>
+          <RoleContext.Provider value={{ role, setRole }}>
+            <GameStack.Navigator initialRouteName="GameLobby">
+              <GameStack.Screen name="GameLobby" component={GameLobby} />
+              <GameStack.Screen name="CreateGame" component={CreateGame} />
+              <GameStack.Screen name="JoinGame" component={JoinGame} />
+              <GameStack.Screen name="GameScreen" component={GameScreen} />
+            </GameStack.Navigator>
+          </RoleContext.Provider>
         </MissionContext.Provider>
       </CodeContext.Provider>
     </HostContext.Provider>

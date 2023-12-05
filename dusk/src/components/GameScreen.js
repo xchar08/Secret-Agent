@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
 import Timer from './Timer';
-import { AuthContext, CodeContext, MissionContext, HostContext } from '../services/gameState';
+import { AuthContext, CodeContext, MissionContext, HostContext, RoleContext } from '../services/gameState';
 import { 
   PHASE_NOT_STARTED, PHASE_TALK, PHASE_TEAM_VOTE, PHASE_TEAM_REVOTE, PHASE_NODE_VOTE, PHASE_OUTCOME, PHASE_COMPLETE, 
   NODE_VOTE_N, NODE_VOTE_Y, NODE_STATE_OPEN, NODE_STATE_SECURED, NODE_STATE_HACKED,
@@ -22,6 +22,7 @@ export default function GameLobby({ navigation, route }) {
   const { code, setCode } = useContext(CodeContext);
   const { host, setHost } = useContext(HostContext);
   const { mission, setMission } = useContext(MissionContext);
+  const {role, setRole} = useContext(RoleContext);
   const [phasekey, setPhaseKey] = useState(PHASE_NOT_STARTED);
   const [party, setParty] = useState([]);
   const [round, setRound] = useState(0);
@@ -41,6 +42,10 @@ export default function GameLobby({ navigation, route }) {
             setMission(missionData.payload);
             setRound(missionData.payload.round_number ?? 0); //dynamic round count 
             setNodes(missionData.payload.nodes);
+            if (mission.hackers && mission.hackers.length > 0) {
+              //console.log(user.profile.uid, mission.hackers[0].id, mission.hackers[1].id);
+              setRole(mission.hackers.filter(x => x.id === user.profile.uid).length > 0 ? "Spy": "Agent");
+            }
            // setParty(missionData.party);
             console.log("NEIGH", user.profile.uid, proposedTeam ? proposedTeam.map(pt => pt.id) : []);
 
@@ -246,7 +251,7 @@ export default function GameLobby({ navigation, route }) {
           <View style={styles.bar}>
             <Text style={styles.headerText}>{`Game ID: ${code}`}</Text>
             <Timer style={styles.timer}></Timer>
-            <Text style={styles.headerText}>{`Your Role: ${(host) ? "Host" : "Participant"}`}</Text>
+            <Text style={styles.headerText}>{`Your Role: ${(role)}`}</Text>
           </View>
         </View>
         <View style={styles.mainBox}>
@@ -266,7 +271,7 @@ export default function GameLobby({ navigation, route }) {
           }
 
 
-          {phasekey === PHASE_NODE_VOTE && <NodeVotePhase isChosen={isChosen} onSubmitVote={handleNodeVoteEnd} />}
+          {phasekey === PHASE_NODE_VOTE && <NodeVotePhase isChosen={isChosen} onSubmitVote={handleNodeVoteEnd} role={role} />}
           {phasekey === PHASE_OUTCOME && <OutcomePhase node={nodes[round - 1]} onEnd={handleOutcomePhaseEnd}/*onEnd needs to be set to handleOutcomePhaseEnd */ />}
           {phasekey === PHASE_COMPLETE && <CompletePhase nodes={nodes} />}
         </View>

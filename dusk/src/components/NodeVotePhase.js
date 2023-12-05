@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextI
 
 import { NODE_VOTE_N, NODE_VOTE_Y } from '../services/api.service';
 
-export default function NodeVotePhase({ onSubmitVote, isChosen }) {
+export default function NodeVotePhase({ onSubmitVote, isChosen, role }) {
   
 
 
@@ -22,12 +22,12 @@ export default function NodeVotePhase({ onSubmitVote, isChosen }) {
           >
             <Text style={styles.blackText}>Encrypt</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {role === "Spy" && <TouchableOpacity
             style={styles.submitButton}
             onPress={() => onSubmitVote(NODE_VOTE_N)}
           >
             <Text style={styles.blackText}>Intercept</Text>
-          </TouchableOpacity>
+          </TouchableOpacity>}
         </>
 
       }

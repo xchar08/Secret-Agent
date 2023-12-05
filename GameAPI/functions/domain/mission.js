@@ -167,7 +167,7 @@ async function addGame(hostId, code) {
         name: user.name,
         photoURL: user.photoURL ?? user.picture
     };
-    let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [hostUser] };
+    let mission = { ...gameState.mission_state, rounds: gameState.rounds, nodes: gameState.nodes, hostId, code, party: [hostUser], hackers:[] };
     await db.ref(`/mission/${code}`).set(mission);
 
     await db.ref(`/mission-party/${code}`).push(hostUser);
@@ -310,7 +310,8 @@ async function gameData() {
             ...mission,
             party: (await db.ref(`/mission-party/${code}`).once('value')).val(),
             nodes: (await db.ref(`/mission-nodes/${code}`).once('value')).val(),
-            rounds: (await db.ref(`/mission-rounds/${code}`).once('value')).val()
+            rounds: (await db.ref(`/mission-rounds/${code}`).once('value')).val(),
+            hackers: (await db.ref(`/mission-hackers/${code}`).once('value')).val(),
         }
         enriched.push(missionEnriched);
     }
@@ -328,7 +329,8 @@ async function get(hostId, code) {
         ...mission,
         party: Object.values((await db.ref(`/mission-party/${code}`).once('value')).val()),
         nodes: Object.values((await db.ref(`/mission-nodes/${code}`).once('value')).val()),
-        rounds: Object.values((await db.ref(`/mission-rounds/${code}`).once('value')).val())
+        rounds: Object.values((await db.ref(`/mission-rounds/${code}`).once('value')).val()),
+        hackers: Object.values((await db.ref(`/mission-hackers/${code}`).once('value')).val()),
     }
     return missionEnriched
 
