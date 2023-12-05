@@ -47,17 +47,17 @@ export default function GameLobby({ navigation, route }) {
               setRole(mission.hackers.filter(x => x.id === user.profile.uid).length > 0 ? "Spy": "Agent");
             }
            // setParty(missionData.party);
-            console.log("NEIGH", user.profile.uid, proposedTeam ? proposedTeam.map(pt => pt.id) : []);
+           // console.log("NEIGH", user.profile.uid, proposedTeam ? proposedTeam.map(pt => pt.id) : []);
 
-            if (proposedTeam && proposedTeam.filter(pt => pt.id === user.profile.uid).length > 0) {
-              setIsChosen(true);
-            }
+           /* if (proposedTeam && proposedTeam.filter(pt => pt.id === user.profile.uid).length > 0) {
+             
+            }*/
 
             //host change happens during this step
             if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 0) {
               const currentRound = missionData.payload.rounds[round];
-              console.log(`HOST SET: `, currentRound, missionData.payload);
-              console.log(`HOST SET ROUND:${round} user.profile.uid === currentRound.round_host.id`, user.profile.uid, currentRound.round_host.id);
+              //console.log(`HOST SET: `, currentRound, missionData.payload);
+             // console.log(`HOST SET ROUND:${round} user.profile.uid === currentRound.round_host.id`, user.profile.uid, currentRound.round_host.id);
               if (currentRound.round_host != -1 && user.profile.uid === currentRound.round_host.id) {
                 setHost(true);
               }
@@ -116,9 +116,14 @@ export default function GameLobby({ navigation, route }) {
         if (snapshot.val() != null) {
           missionGetProposedTeam(user.idToken, code, round).then(teamData => {
            // console.log('CHIRP', teamData.payload);
+           if (host) {
+            console.log('CHIRP', code, round, user.profile.name, teamData.payload);
+           }
             setProposedTeam(teamData.payload);
             setTeamSubmitted(true);
-
+            
+            setIsChosen(teamData.payload.filter(pt => pt.id === user.profile.uid).length > 0);
+            console.log('CHIRP EnD', code, round, user.profile.name, isChosen, teamData.payload.filter(pt => pt.id === user.profile.uid).length > 0);
           });
         }
         else
@@ -141,11 +146,11 @@ export default function GameLobby({ navigation, route }) {
 
 
   const hostHandleStart = () => {
-    console.log("HANDLE START PRESSED");
+   // console.log("HANDLE START PRESSED");
     // setPhaseKey(PHASE_TALK);
     if (host) {
       missionAdvance(user.idToken, code).then((missionResult) => {
-        console.log("ADVANCING", missionResult);
+      //  console.log("ADVANCING", missionResult);
         //setPhaseKey(PHASE_TALK);
         if (missionResult.payload != null) {
 
@@ -163,30 +168,30 @@ export default function GameLobby({ navigation, route }) {
     //setnodes(newnodes);
   }
   const handleChatEnd = () => {
-    console.log('CHAT BEGIN', user, code, host, mission);
+   // console.log('CHAT BEGIN', user, code, host, mission);
     if (host) {
       missionAdvance(user.idToken, code).then((missionResult) => {
         if (missionResult.payload) {
           setMission(missionResult.payload);
         }
 
-        console.log("CHAT ENDED", code, host, missionResult);
+      //  console.log("CHAT ENDED", code, host, missionResult);
       });
     }
 
   };
 
   const handleSubmitTeam = (team) => {
-    console.log("HANDLE SUBMIT TEAM");
+   // console.log("HANDLE SUBMIT TEAM");
     missionProposeTeam(user.idToken, code, round, team).then((playersPayload) => {
-      console.log('RIBBIT', playersPayload);
+      //console.log('RIBBIT', playersPayload);
       if (host) {
         missionAdvance(user.idToken, code).then((missionResult) => {
           setMission(missionResult.payload);
 
 
 
-          console.log("SUBMIT TEAM", missionResult);
+          //console.log("SUBMIT TEAM", missionResult);
         });
       }
     });

@@ -100,7 +100,7 @@ async function missionDebug() {
 
 async function missionAdvance(idToken, code) {
   let url = `${baseURL}/mission/${code}/round/advance`;
-  console.log("Advancing:: ", url);
+//  console.log("Advancing:: ", url);
   return await postData(url, null, idToken);
 }
 async function missionProposeTeam(idToken, code, round_number, players) {

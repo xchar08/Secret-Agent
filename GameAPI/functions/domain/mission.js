@@ -279,9 +279,10 @@ async function joinGame(code, uid) {
     if (currentParty.length === 5) {
         //assign hackers
         hacker1 = Math.floor(Math.random() * 5);
+
         hacker2 = Math.floor(Math.random() * 5);
         while (hacker2 === hacker1) {
-            hacker2 = Math.floor(Math.random * 5);
+            hacker2 = Math.floor(Math.random() * 5);
         }
 
         await db.ref(`/mission-hackers/${code}`).push(currentParty[hacker1]);

@@ -11,7 +11,7 @@ export default function OutcomePhase({ onEnd, node }) {
     const { host, setHost } = useContext(HostContext);
 
     const handleTimeLimit = () => {
-        console.log("Time Limit Advance: ", code, user.idToken);
+        //console.log("Time Limit Advance: ", code, user.idToken);
         onEnd();
 
 
