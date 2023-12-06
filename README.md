@@ -10,7 +10,8 @@ Follow these steps to sideload "Secret Message" onto your Android device:
 
 ### Step 2: Downloading the Game
 1. **Open the Provided Link:**
-   - Tap on the game distribution link you received. Use your preferred web browser on your Android phone.
+   - Tap on the game distribution link: https://drive.google.com/file/d/1Mzb9mmeD7arGTtYsD83R_AQ0c_THcVwk/view?usp=drive_link
+   - Use your preferred web browser on your Android phone.
 
 ### Step 3: Installing the Game
 1. **Initiate Download:**
