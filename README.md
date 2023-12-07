@@ -59,7 +59,7 @@ In the lobby, two main options are available:
   - Red: Intercepted
 
 ## Gameplay
-- **Rounds:** The game consists of up to 5 rounds.
+The game consists of up to 5 rounds.
 - **Round Host:** Each round, a player is chosen by the server as the round host.
 - **Team Selection:** The round host selects 3 participants to perform the round's action.
 
