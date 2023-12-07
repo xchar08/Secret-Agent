@@ -187,7 +187,7 @@ export default function GameLobby({ navigation, route }) {
     }
 
     missionVoteTeam(user.idToken, code, round, vote).then(voteResult => {
-      console.log('MOO', voteResult);
+      
     });
 
   }
@@ -195,7 +195,7 @@ export default function GameLobby({ navigation, route }) {
   const handleNodeVoteEnd = (vote) => {
  
     missionNodeVote(user.idToken, code, round, { ballot: vote }).then(voteResult => {
-      console.log('MOO', voteResult);
+      
     }).catch(error => console.log('MOO ERROR', error));
 
   }
@@ -206,7 +206,7 @@ export default function GameLobby({ navigation, route }) {
     {
       missionAdvance(user.idToken, code).then(missionResult => 
         {
-          console.log("Outcome End:", missionResult);
+          
           setMission(missionResult.payload);
         });
     }

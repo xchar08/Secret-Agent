@@ -10,7 +10,7 @@ export default function TeamVotePhase({players, onSubmitTeam, teamSubmitted, pro
     const { code, setCode } = useContext(CodeContext);
     const { host, setHost } = useContext(HostContext);
     const { mission, setMission } = useContext(MissionContext);
-    console.log("team vote mission", mission);
+
 
 
     const [selectedPlayers, setSelectedPlayers] = useState((players) ? players.map((player) => ({ ...player, selected: false })) : []);
@@ -29,8 +29,7 @@ export default function TeamVotePhase({players, onSubmitTeam, teamSubmitted, pro
     
     }
 
-    console.log("players", players);
-    console.log("isHost", host);
+
 
     return (
 

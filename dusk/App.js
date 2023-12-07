@@ -65,7 +65,7 @@ export default function App() {
     const FIREBASE_AUTH = authProvider.auth();
 
     FIREBASE_AUTH.onAuthStateChanged((user) => {
-      console.log(user);
+  
       setUser(user);
     })
   }, []);
