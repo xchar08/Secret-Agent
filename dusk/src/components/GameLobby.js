@@ -4,11 +4,7 @@ import bluebackground from '../assets/bluebackground.png';
 import { sessionDebug } from '../services/api.service';
 import { AuthContext, HostContext } from '../services/gameState';
 
-//import { FIREBASE_AUTH } from '../environments/config';
-
 import {firebase as authProvider} from '@react-native-firebase/auth';
-
-
 
 const FIREBASE_AUTH = authProvider.auth();
 
@@ -23,7 +19,7 @@ export default function GameLobby({ navigation }) {
   {
     FIREBASE_AUTH.signOut();
   }
-  // console.log("game:", game);
+ 
   const [sessions, setSessions] = useState([]);
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
@@ -31,7 +27,7 @@ export default function GameLobby({ navigation }) {
     async function getSession() {
 
       const response = (await sessionDebug());
-      //console.log(response);
+    
       setSessions(response.payload);
       setDidStart(true);
       setSessionLength(Object.keys(response.payload).length);

@@ -13,7 +13,6 @@ export default function TeamVotePhase({players, onSubmitTeam, teamSubmitted, pro
     console.log("team vote mission", mission);
 
 
-    //const selectedPlayers = players.map((player) => ({ ...player, selected: false }));
     const [selectedPlayers, setSelectedPlayers] = useState((players) ? players.map((player) => ({ ...player, selected: false })) : []);
     function handlePlayerPress(player) {
 

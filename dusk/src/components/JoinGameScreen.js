@@ -13,12 +13,12 @@ export default function JoinGame({ navigation }) {
   const [didStart, setDidStart] = useState(false);
   const [sessionLength, setSessionLength] = useState(0);
 
-  //console.log("game", game);
+  
   useEffect((() => {
     async function getSession() {
 
       const response = (await missionDebug());
-      //console.log(response.payload);
+     
       setSessions(response.payload);
       setDidStart(true);
       setSessionLength(Object.keys(response.payload).length);
@@ -37,7 +37,7 @@ export default function JoinGame({ navigation }) {
         console.log("Join Failed.", joinMissionResult.error);
         return;
       }
-      //console.log("MISSION JOINED", joinMissionResult.payload);
+  
 
       setCode(item.code);
       setMission(item);
@@ -48,7 +48,7 @@ export default function JoinGame({ navigation }) {
 
   _renderItem = ({ item }) => {
 
-    //console.log("Session: ", item);
+
 
     return (
       <>

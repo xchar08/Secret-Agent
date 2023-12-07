@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import cityscape from '../assets/cityscape.jpg';
 
-//import { GoogleAuthProvider, getAuth, signInWithCredential } from "firebase/auth";
 import {
   GoogleSignin,
   GoogleSigninButton,
@@ -12,7 +11,7 @@ import {
 import { sessionStart } from '../services/api.service';
 import { AuthContext } from '../services/gameState';
 
-import firebase from '@react-native-firebase/app';
+
 import { firebase as authProvider } from '@react-native-firebase/auth';
 
 export default function LoginPage({ navigation }) {
@@ -22,9 +21,8 @@ export default function LoginPage({ navigation }) {
   //disable the google sign in button after clicking signin
   const [isSigninInProgress, setIsSigninInProgress] = useState(false);
 
-  //const [idToken, setIdToken] = useState(null);
+ 
   //must be called before signing in 
-
   //web client id came from firebase authentication
   GoogleSignin.configure({
     webClientId: '739597303932-jl2p9mkue1412upfn4dqk2kf1o95lr0i.apps.googleusercontent.com'
@@ -34,22 +32,9 @@ export default function LoginPage({ navigation }) {
 
   //function handler for the google sign in click
   function handleSignIn() {
-    /*let options = {
-      apiKey: "AIzaSyAW5OxWzEVtm9EyPJHkaiO3yTZarFAXrEA",
-      authDomain: "cse3310-game.firebaseapp.com",
-      databaseURL: "https://cse3310-game-default-rtdb.firebaseio.com",
-      projectId: "cse3310-game",
-      storageBucket: "cse3310-game.appspot.com",
-      messagingSenderId: "739597303932",
-      appId: "1:739597303932:web:3cb760a5849478110009f9"
-    }*/
-
-
-   // const firebaseApp = firebase.initializeApp(options).then(async () => {
       const FIREBASE_AUTH = authProvider.auth(/*firebaseApp*/);
       setIsSigninInProgress(true);
       signIn(FIREBASE_AUTH);
-   // });
   }
 
 
@@ -60,11 +45,6 @@ export default function LoginPage({ navigation }) {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
 
-      //const credential = GoogleAuthProvider.credential(userInfo.idToken);
-      //const firebaseUser = await signInWithCredential(getAuth(), credential);
-      //let token = await firebaseUser.user.getIdToken();
-
-
       const credential = authProvider.auth.GoogleAuthProvider.credential(userInfo.idToken);
       const firebaseUser = await FIREBASE_AUTH.signInWithCredential(credential);
 
@@ -73,7 +53,7 @@ export default function LoginPage({ navigation }) {
       
       console.log(token);
       const userProfile = await sessionStart(token);
-      //console.log(userProfile);
+      
       setIsSigninInProgress(false);
 
       setUser({
@@ -81,7 +61,7 @@ export default function LoginPage({ navigation }) {
         profile: userProfile.payLoad
       });
 
-      //console.log(game);
+     
       navigation.navigate('GameLobby');
 
 

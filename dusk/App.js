@@ -26,6 +26,7 @@ const AuthNavigator = () => (
 );
 
 const GameNavigator = () => {
+  //track the current game conditions using, code, host, mission, and role
   const [code, setCode] = useState(null);
   const [host, setHost] = useState(null);
   const [mission, setMission] = useState(null);
@@ -52,10 +53,10 @@ const GameNavigator = () => {
 export default function App() {
 
 
-  //initialize the game state when the app loads,
-  // and other screens will pull this context to update 
-  //the various fields on the gamestate over time.
-  //const [game, setGame] = useState(gameState);
+  //initialize the authentication state when the app loads,
+  // and other screens will pull this context to access 
+  // the user profile 
+  
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -66,12 +67,7 @@ export default function App() {
     FIREBASE_AUTH.onAuthStateChanged((user) => {
       console.log(user);
       setUser(user);
-
     })
-
-
-
-
   }, []);
 
 

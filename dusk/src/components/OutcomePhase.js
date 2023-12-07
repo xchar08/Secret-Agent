@@ -11,7 +11,7 @@ export default function OutcomePhase({ onEnd, node }) {
     const { host, setHost } = useContext(HostContext);
 
     const handleTimeLimit = () => {
-        //console.log("Time Limit Advance: ", code, user.idToken);
+        
         onEnd();
 
 
@@ -21,10 +21,9 @@ export default function OutcomePhase({ onEnd, node }) {
         <View>
             <View style={styles.backDrop}>
             <Text style={styles.text}>The message was:</Text>
-            {node.state === NODE_STATE_SECURED && <Text style={styles.text}>ENCRYPTED</Text> /** Inside this block you want to put a text element that says Encrypted. */}
-            {node.state === NODE_STATE_HACKED && <Text style={styles.text}>INTERCEPTED</Text>/** Inside this block you want to put a text element that says Intercepted.  */}
-            {/** Inside this block you want to put a text element that says Time remaining before the next round. */}
-            {/** added onlimit for you because it is how we move from outcome phase back to not started for the next round. */}
+            {node.state === NODE_STATE_SECURED && <Text style={styles.text}>ENCRYPTED</Text> }
+            {node.state === NODE_STATE_HACKED && <Text style={styles.text}>INTERCEPTED</Text>}
+        
             <Timer style={styles.timer} limit={5} onLimit={handleTimeLimit}></Timer>
             </View>
         </View>

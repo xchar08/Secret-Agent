@@ -1,11 +1,11 @@
 const uuid = require('uuid');
 const { db } = require('./db.js');
-//const { missionAdvance } = require('../../../dusk/src/services/api.service.js');
+
 
 const ROUND_HOST_INDEX_OFFSET = 1;
 const MISSION_PARTY_NOT_READY = "mission/party_not_ready";
 const MIN_HACK_WIN_VOTE = 1;
-const PARTY_SIZE = 2;   //change this to 5 later
+const PARTY_SIZE = 5;   
 const MISSION_NOTFOUND = "mission/not_found";
 const MISSION_INVALID_TEAM_PROPOSAL_LENGTH = "mission/invalid_team_proposal_length";
 
@@ -160,7 +160,6 @@ async function addGame(hostId, code) {
         }]
     };
 
-    // gameTable.push(gameState);
     let user = (await db.ref(`/user/${hostId}`).once('value')).val();
     let hostUser = {
         id: hostId,
@@ -172,7 +171,7 @@ async function addGame(hostId, code) {
 
     await db.ref(`/mission-party/${code}`).push(hostUser);
 
-    //await db.ref(`/mission-hackers/${code}`).set([]);
+  
     await db.ref(`/mission-nodes/${code}/1`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/2`).set({ state: NODE_STATE_OPEN });
     await db.ref(`/mission-nodes/${code}/3`).set({ state: NODE_STATE_OPEN });
@@ -184,27 +183,6 @@ async function addGame(hostId, code) {
     await db.ref(`/mission-rounds/${code}/4`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
     await db.ref(`/mission-rounds/${code}/5`).set({ round_host: NOT_SET, outcome: NODE_STATE_OPEN });
 
-    
-    //await db.ref(`/mission-rounds-messages/${code}/1`).set([]);
-    //await db.ref(`/mission-rounds-messages/${code}/2`).set([]);
-    //await db.ref(`/mission-rounds-messages/${code}/3`).set([]);
-    //await db.ref(`/mission-rounds-messages/${code}/4`).set([]);
-    //await db.ref(`/mission-rounds-messages/${code}/5`).set([]);
-    //await db.ref(`/mission-rounds-proposed-team/${code}/1`).set([]);
-    //await db.ref(`/mission-rounds-proposed-team/${code}/2`).set([]);
-    //await db.ref(`/mission-rounds-proposed-team/${code}/3`).set([]);
-    //await db.ref(`/mission-rounds-proposed-team/${code}/4`).set([]);
-    //await db.ref(`/mission-rounds-proposed-team/${code}/5`).set([]);
-    // await db.ref(`/mission-rounds-team/${code}/1`).set([]);
-    // await db.ref(`/mission-rounds-team/${code}/2`).set([]);
-    // await db.ref(`/mission-rounds-team/${code}/3`).set([]);
-    // await db.ref(`/mission-rounds-team/${code}/4`).set([]);
-    // await db.ref(`/mission-rounds-team/${code}/5`).set([]);
-    // await db.ref(`/mission-rounds-team-vote/${code}/1`).set([]);
-    // await db.ref(`/mission-rounds-team-vote/${code}/2`).set([]);
-    // await db.ref(`/mission-rounds-team-vote/${code}/3`).set([]);
-    // await db.ref(`/mission-rounds-team-vote/${code}/4`).set([]);
-    // await db.ref(`/mission-rounds-team-vote/${code}/5`).set([]);
     await db.ref(`/mission-log/${code}`).push({
         userId: hostId,
         action: "Game created.",
@@ -225,12 +203,12 @@ async function joinGame(code, uid) {
         throw Error(MISSION_NOTFOUND);
     }
 
-   // console.log("Host Game", hostGame);
+   
 
     //check how may players are in the party by retrieving the party
     let currentParty = Object.values((await db.ref(`/mission-party/${code}`).once('value')).val());
 
-  //  console.log("Players Joined: ", Object.values(currentParty).length);
+  
 
 
 
@@ -266,11 +244,6 @@ async function joinGame(code, uid) {
         time: new Date()
     });
 
-
-
-    //debug check
-  //  console.log(Object.values(((await db.ref(`/mission-party/${code}`).once('value')).val())));
-
     //retrieve the current party's latest values
     currentParty = Object.values((await db.ref(`/mission-party/${code}`).once('value')).val());
 
@@ -297,13 +270,11 @@ async function joinGame(code, uid) {
 async function gameData() {
 
     let missionsCodes = (await db.ref(`/mission`).once('value')).val();
-    //console.log(missionsCodes);
-    //console.log(Object.keys(missionsCodes));
+    
     let enriched = [];
     let code = "";
     for (var i = 0; i < Object.keys(missionsCodes).length; i++) {
-      //  console.log("code:", Object.keys(missionsCodes)[i]);
-        //let mission = (await db.ref(`/mission/${code}`).once('value')).val();
+     
 
         let code = Object.keys(missionsCodes)[i];
         let mission = missionsCodes[code];
@@ -350,7 +321,7 @@ async function advanceRound(hostId, code) {
     console.log("advancing code", code);
     if (missionPartyObject) {
         currentParty = Object.values(missionPartyObject);
-        //console.log(currentParty);
+        
     }
     else {
         currentParty = [];
@@ -362,9 +333,7 @@ async function advanceRound(hostId, code) {
     switch (mission.current_phase) {
         case PHASE_NOT_STARTED:
             {
-                /**
-                 * 
-                 */
+                
                 mission.round_number++;
                 mission.current_phase = PHASE_TALK;
 
@@ -383,16 +352,8 @@ async function advanceRound(hostId, code) {
         case PHASE_TEAM_REVOTE:
         case PHASE_TEAM_VOTE:
             {
-                //let votes = Object.values((await db.ref(`/mission/${code}/mission-rounds-proposed-team/${mission.round}`).once('value')).val());
-
-                /*if (votes === null || votes.filter(v => v.ballot === NODE_VOTE_Y).length() < 3) {
-                    //nays have it
-                    mission.current_phase = PHASE_TEAM_REVOTE;
-                }
-               { else*/
-                //console.log('hoot', code, mission);
                 mission.current_phase = PHASE_NODE_VOTE;
-                //}
+                
                 await db.ref(`/mission/${code}`).set({ ...mission });
 
             }
@@ -429,7 +390,7 @@ async function advanceRound(hostId, code) {
             break;
         case PHASE_OUTCOME:
             {
-                if (mission.round_number < 5) {
+                if (mission.round_number < ROUND_FIVE) {
                     const round = (await db.ref(`/mission-rounds/${code}/${mission.round_number + ROUND_HOST_INDEX_OFFSET}`).once('value')).val();
                     await db.ref(`/mission-rounds/${code}/${mission.round_number + ROUND_HOST_INDEX_OFFSET}`).set({ ...round, round_host: currentParty[mission.round_number] });
 
@@ -447,7 +408,7 @@ async function advanceRound(hostId, code) {
             break;
     }
 
-    //console.log(mission);
+    
     return await get(hostId, code);
 
 

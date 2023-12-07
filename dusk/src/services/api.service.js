@@ -100,7 +100,7 @@ async function missionDebug() {
 
 async function missionAdvance(idToken, code) {
   let url = `${baseURL}/mission/${code}/round/advance`;
-//  console.log("Advancing:: ", url);
+
   return await postData(url, null, idToken);
 }
 async function missionProposeTeam(idToken, code, round_number, players) {
@@ -154,15 +154,12 @@ async function postData(url = "", data = {}, authToken = "") {
       referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
       body: (data != null) ? JSON.stringify(data) : undefined, // body data type must match "Content-Type" header
     });
-    // console.log("status: ", response.status);
+
     let responseData = await response.json();
-   // console.log(`Response Data [${url}):`, responseData);
+  
     return responseData; // parses JSON response into native JavaScript objects
   }
-  /*
-  postData("https://example.com/answer", { answer: 42 }).then((data) => {
-    console.log(data); // JSON data parsed by `data.json()` call
-  });*/
+ 
   
 
   exports.sessionStart = sessionStart;

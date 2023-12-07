@@ -12,11 +12,7 @@ async function verifyToken(idToken) {
 
 async function login(idToken) {
     let userData = await verifyToken(idToken);
-    //let result = userTable.findIndex(x => x.id === userData.uid);
-
-
-    //let result = {...(await db.ref(`/user/${userData.uid}`).once('value')).val()};
-
+   
     result = { ...userData, session: idToken };
     console.log("Update  Result:", result);
     delete (result.firebase);

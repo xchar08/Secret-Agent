@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const Timer = ({limit, onLimit}) => {
-  //console.log("Limit: ", limit);
+ 
   const [prevSeconds, setPrevSeconds] = useState(limit); // Initial seconds value for countdown
-  //let prevSeconds = limit;
+  
 
   useEffect(() => {
-  //  console.log("Mounted: ", prevSeconds);
+ 
 
   if (prevSeconds === 0) {
     onLimit();
@@ -22,8 +22,7 @@ const Timer = ({limit, onLimit}) => {
 
   
 
-   // Clean up the interval when the component is unmounted
-   //return () =>
+
 
   const formatTime = (timeInSeconds) => {
     const minutes = Math.floor(timeInSeconds / 60);

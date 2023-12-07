@@ -43,21 +43,15 @@ export default function GameLobby({ navigation, route }) {
             setRound(missionData.payload.round_number ?? 0); //dynamic round count 
             setNodes(missionData.payload.nodes);
             if (mission.hackers && mission.hackers.length > 0) {
-              //console.log(user.profile.uid, mission.hackers[0].id, mission.hackers[1].id);
+              
               setRole(mission.hackers.filter(x => x.id === user.profile.uid).length > 0 ? "Spy": "Agent");
             }
-           // setParty(missionData.party);
-           // console.log("NEIGH", user.profile.uid, proposedTeam ? proposedTeam.map(pt => pt.id) : []);
-
-           /* if (proposedTeam && proposedTeam.filter(pt => pt.id === user.profile.uid).length > 0) {
-             
-            }*/
+          
 
             //host change happens during this step
             if (missionData.payload.current_phase === PHASE_NOT_STARTED && missionData.payload.round_number > 0) {
               const currentRound = missionData.payload.rounds[round];
-              //console.log(`HOST SET: `, currentRound, missionData.payload);
-             // console.log(`HOST SET ROUND:${round} user.profile.uid === currentRound.round_host.id`, user.profile.uid, currentRound.round_host.id);
+          
               if (currentRound.round_host != -1 && user.profile.uid === currentRound.round_host.id) {
                 setHost(true);
               }
@@ -77,7 +71,7 @@ export default function GameLobby({ navigation, route }) {
  
             }
 
-            //do this part last
+            //update phase
             if (nodes.filter(node => node.state === NODE_STATE_HACKED).length === 3 && phasekey !== PHASE_COMPLETE)
             {
               setPhaseKey(PHASE_COMPLETE);
@@ -95,40 +89,32 @@ export default function GameLobby({ navigation, route }) {
 
       const secondReference = FIREBASE_DATABASE
       .ref(`/mission-party/${code}`).on('value', (snapshot) => {
-        //console.log("BARK", snapshot.val());
+        
 
 
         if (snapshot.val() != null && party.length !== 5) {
-          //console.log('SET PARTY', code, host, Object.values(snapshot.val()), mission.party);
+          
           setParty(Object.values(snapshot.val()));
-          /*setPlayers((mission.payload) ? Object.values(mission.payload.party) : [
-            { id: 1, name: 'Player 1' },
-            { id: 2, name: 'Player 2' },
-            { id: 3, name: 'Player 3' },
-            { id: 4, name: 'Player 4' },
-            { id: 5, name: 'Player 5' },
-          ]);*/
+        
         }
       });
     const thirdReference = FIREBASE_DATABASE
       .ref(`/mission-proposed-team/${code}/${round}`).on('value', (snapshot) => {
-       // console.log('HOWL round:', round);
+       
         if (snapshot.val() != null) {
           missionGetProposedTeam(user.idToken, code, round).then(teamData => {
-           // console.log('CHIRP', teamData.payload);
-           if (host) {
-            console.log('CHIRP', code, round, user.profile.name, teamData.payload);
-           }
+         
+    
             setProposedTeam(teamData.payload);
             setTeamSubmitted(true);
             
             setIsChosen(teamData.payload.filter(pt => pt.id === user.profile.uid).length > 0);
-            console.log('CHIRP EnD', code, round, user.profile.name, isChosen, teamData.payload.filter(pt => pt.id === user.profile.uid).length > 0);
+           
           });
         }
         else
         {
-         // console.log("WAIL snapshot is null");
+         
           setProposedTeam([]);
           setTeamSubmitted(false);
         }
@@ -146,12 +132,10 @@ export default function GameLobby({ navigation, route }) {
 
 
   const hostHandleStart = () => {
-   // console.log("HANDLE START PRESSED");
-    // setPhaseKey(PHASE_TALK);
+  
     if (host) {
       missionAdvance(user.idToken, code).then((missionResult) => {
-      //  console.log("ADVANCING", missionResult);
-        //setPhaseKey(PHASE_TALK);
+     
         if (missionResult.payload != null) {
 
           setMission(missionResult.payload);
@@ -160,38 +144,28 @@ export default function GameLobby({ navigation, route }) {
     }
   };
 
-
-
-  const handlePress = (index) => { //replace inside contents of code as needed
-    const newnodes = [...nodes];
-    newnodes[index] = !newnodes[index];
-    //setnodes(newnodes);
-  }
   const handleChatEnd = () => {
-   // console.log('CHAT BEGIN', user, code, host, mission);
+
     if (host) {
       missionAdvance(user.idToken, code).then((missionResult) => {
         if (missionResult.payload) {
           setMission(missionResult.payload);
         }
 
-      //  console.log("CHAT ENDED", code, host, missionResult);
+     
       });
     }
 
   };
 
   const handleSubmitTeam = (team) => {
-   // console.log("HANDLE SUBMIT TEAM");
+
     missionProposeTeam(user.idToken, code, round, team).then((playersPayload) => {
-      //console.log('RIBBIT', playersPayload);
+    
       if (host) {
         missionAdvance(user.idToken, code).then((missionResult) => {
           setMission(missionResult.payload);
 
-
-
-          //console.log("SUBMIT TEAM", missionResult);
         });
       }
     });
@@ -203,7 +177,7 @@ export default function GameLobby({ navigation, route }) {
     if (vote === null) {
       if (host) {
         missionAdvance(user.idToken, code).then((missionResult) => {
-          //setPhaseKey(PHASE_NODE_VOTE);
+        
           setMission(missionResult.payload);
 
         });
@@ -219,22 +193,14 @@ export default function GameLobby({ navigation, route }) {
   }
 
   const handleNodeVoteEnd = (vote) => {
-    /*
-    missionAdvance(game.idToken, game.code).then((mission) => {
-      setPhaseKey(PHASE_OUTCOME);
-      game.mission = mission.payload;
-      
-    });*/
+ 
     missionNodeVote(user.idToken, code, round, { ballot: vote }).then(voteResult => {
       console.log('MOO', voteResult);
     }).catch(error => console.log('MOO ERROR', error));
 
   }
 
-  /**
-   * handle Outcome phase end needs to be added here
-   * it needs to call missionAdvance but only if the user is the host.  
-   */
+
   const handleOutcomePhaseEnd = () => {
     if (host)
     {
@@ -285,7 +251,7 @@ export default function GameLobby({ navigation, route }) {
             <TouchableOpacity
               key={index}
               style={[styles.circle, { backgroundColor: node.state === NODE_STATE_OPEN ? 'blue' : node.state === NODE_STATE_SECURED ? 'green' : 'red' }]}
-              onPress={() => handlePress(index)}
+            
             />
           ))}
         </View>}

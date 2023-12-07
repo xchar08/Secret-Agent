@@ -22,16 +22,16 @@ export default function CreateGame({ navigation }) {
   
   const [tempCode, setTempCode] = useState(makeGameID(4));
  
- // const [code, setCode] = useState();
+
 
   const handleCreateGameButtonPress = () => {
 
     missionNew(user.idToken, tempCode).then(missionResult => {
       if (missionResult.error) {
-        console.log(missionResult.error);
+        
         return;
       }
-      console.log('missionResult', missionResult.payload);
+     
       setCode(tempCode);
       setMission(missionResult.payload);
       navigation.navigate('GameScreen');
@@ -40,7 +40,7 @@ export default function CreateGame({ navigation }) {
 
   };
 
-  //console.log("game", game);
+  
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
