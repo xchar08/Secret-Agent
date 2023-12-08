@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
 import cityscape from '../assets/cityscape.jpg';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+
 
 export default function SignUpScreen({ navigation }) {
 

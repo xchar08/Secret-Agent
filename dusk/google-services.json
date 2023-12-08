@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "739597303932",
+    "firebase_url": "https://cse3310-game-default-rtdb.firebaseio.com",
+    "project_id": "cse3310-game",
+    "storage_bucket": "cse3310-game.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:739597303932:android:49f2826390366d830009f9",
+        "android_client_info": {
+          "package_name": "com.dusk.secretmessage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "739597303932-g7jv9e8cc6t450jo2cmc0kegpudroddh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.dusk.secretmessage",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "739597303932-jl2p9mkue1412upfn4dqk2kf1o95lr0i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAL0g826OTlUR5B5Jb4oLOdmjVvm4T-9ZA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "739597303932-jl2p9mkue1412upfn4dqk2kf1o95lr0i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

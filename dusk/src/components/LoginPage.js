@@ -1,76 +1,96 @@
-import React, { useState } from 'react';
-import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import cityscape from '../assets/cityscape.jpg';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+
+import {
+  GoogleSignin,
+  GoogleSigninButton,
+  statusCodes,
+} from '@react-native-google-signin/google-signin';
+
+import { sessionStart } from '../services/api.service';
+import { AuthContext } from '../services/gameState';
+
+
+import { firebase as authProvider } from '@react-native-firebase/auth';
 
 export default function LoginPage({ navigation }) {
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const auth = FIREBASE_AUTH;
 
-  const signIn = async () => { //not used in this screen, used in SignUpScreen.js
-    setLoading(true);
-    try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
-    } catch (error) {
-      console.log(error);
-      alert('Sign in failed: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
+  const { user, setUser } = useContext(AuthContext);
+  //disable the google sign in button after clicking signin
+  const [isSigninInProgress, setIsSigninInProgress] = useState(false);
+
+ 
+  //must be called before signing in 
+  //web client id came from firebase authentication
+  GoogleSignin.configure({
+    webClientId: '739597303932-jl2p9mkue1412upfn4dqk2kf1o95lr0i.apps.googleusercontent.com'
+
+  });
+
+
+  //function handler for the google sign in click
+  function handleSignIn() {
+      const FIREBASE_AUTH = authProvider.auth(/*firebaseApp*/);
+      setIsSigninInProgress(true);
+      signIn(FIREBASE_AUTH);
   }
 
 
+  //function that calls the google sign in web screen
+  signIn = async (FIREBASE_AUTH) => {
+    try {
+
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+
+      const credential = authProvider.auth.GoogleAuthProvider.credential(userInfo.idToken);
+      const firebaseUser = await FIREBASE_AUTH.signInWithCredential(credential);
+
+      const token = await firebaseUser.user.getIdToken();
+
+      const userProfile = await sessionStart(token);
+      
+      setIsSigninInProgress(false);
+
+      setUser({
+        idToken: token,
+        profile: userProfile.payLoad
+      });
+
+     
+      navigation.navigate('GameLobby');
+
+
+
+    } catch (error) {
+      console.log(error);
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+      } else if (error.code === statusCodes.IN_PROGRESS) {
+        // operation (e.g. sign in) is in progress already
+      } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        // play services not available or outdated
+      } else {
+        // some other error happened
+      }
+    }
+  };
 
   return (
+
     <ImageBackground source={cityscape} resizeMode="cover" style={styles.image}>
       <View style={styles.login}>
-        <KeyboardAvoidingView behavior="padding">
-          <Text style={styles.text}>Login</Text>
-
-          <TextInput
-            onChangeText={text => setEmail(text)}
-            value={email}
-            style={styles.input}
-            placeholder="Email"
-            placeholderTextColor="white"
-
-          />
-          <TextInput
-            onChangeText={text => setPassword(text)}
-            style={styles.input}
-            secureTextEntry={true}
-            placeholder="Password"
-            placeholderTextColor="white"
-          />
+        <Text style={styles.text}>Login</Text>
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Wide}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={handleSignIn}
+          disabled={isSigninInProgress}
 
 
-          <TouchableOpacity style={styles.loginButton} onPress={() => navigation.navigate('SignUpScreen')}
-
-            color="#841584"
-            accessibilityLabel="Learn more about this purple button"
-
-          >
-            <Text style={styles.buttonText}>
-              Create Account
-            </Text>
-          </TouchableOpacity>
-
-          {loading ? (
-            <ActivityIndicator size="large" />
-          ) : (
-            <TouchableOpacity style={styles.loginButton} onPress={() => signIn()}>
-              <Text style={styles.buttonText}>
-                Login
-              </Text>
-            </TouchableOpacity>
-          )}
-
-        </KeyboardAvoidingView>
+        />
       </View>
     </ImageBackground>
 
@@ -129,6 +149,7 @@ const styles = StyleSheet.create({
     padding: 5,
     margin: 10,
     paddingBottom: 60,
+    alignItems: 'center'
   },
 
   loginButton: {

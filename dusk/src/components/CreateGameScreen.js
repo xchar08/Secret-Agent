@@ -1,62 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, StatusBar, ImageBackground, TextInput, TouchableOpacity } from 'react-native';
 import bluebackground from '../assets/bluebackground.png';
+import {missionNew} from '../services/api.service';
 
+import {AuthContext, CodeContext, MissionContext} from '../services/gameState';
+
+
+const makeGameID = (length) => {
+  let id = '';
+  const characters = '0123456789';
+  for (let i = 0; i < length; i++) {
+    id += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return id;
+};
 
 export default function CreateGame({ navigation }) {
+  const {user, setUser} = useContext(AuthContext);
+  const {code, setCode} = useContext(CodeContext);
+  const {mission, setMission} = useContext(MissionContext);
+  
+  const [tempCode, setTempCode] = useState(makeGameID(4));
+ 
 
-  const [name, setName] = useState('');
-
-  // Function to handle the button press
-  const handleSubmit = () => {
-    // Do something with the entered name, e.g., submit it
-    if (!(name.trim() === '')) {
-      alert(`Hello, ${name}!`);
-    }
-  };
-
-  // Determine if the button should be disabled
-  const isButtonDisabled = name.trim() === '';
 
   const handleCreateGameButtonPress = () => {
-    if (!isButtonDisabled) {
-      let gameID = makeGameID(4);
-      alert(`Game created! GameID: ${gameID} `);
-      navigation.navigate('GameScreen', { gameID })
-      // Perform your action when the button is pressed and the name is not empty
-    } else {
-      alert("Name is required");
-      // Optionally provide feedback that the name is required
-    }
+
+    missionNew(user.idToken, tempCode).then(missionResult => {
+      if (missionResult.error) {
+        
+        return;
+      }
+     
+      setCode(tempCode);
+      setMission(missionResult.payload);
+      navigation.navigate('GameScreen');
+    });
+    
+
   };
 
-  const makeGameID = (length) => {
-    let id = '';
-    const characters = '0123456789';
-    for (let i = 0; i < length; i++) {
-      id += characters.charAt(Math.floor(Math.random() * characters.length));
-    }
-    return id;
-  };
-
+  
   return (
     <View style={styles.container}>
       <ImageBackground source={bluebackground} resizeMode="cover" style={styles.image}>
         <Text style={styles.text}>Create Game</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter Name"
-          placeholderTextColor="darkblue"
-          onChangeText={text => setName(text)}
-          value={name}
-          onSubmitEditing={handleSubmit}
-        />
-
+        <Text style={styles.text}>Game Join Id: {tempCode}</Text>
         <TouchableOpacity
-          style={[styles.GameLobbyButton, isButtonDisabled && styles.disabledButton]}
+          style={[styles.GameLobbyButton]}
           onPress={handleCreateGameButtonPress}
-          disabled={isButtonDisabled}
+        
         >
           <Text style={styles.buttonText}>Create Game</Text>
         </TouchableOpacity>
@@ -83,6 +77,16 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 42,
     lineHeight: 84,
+    fontWeight: 'bold',
+    textAlign: 'center',
+
+    marginLeft: 20,
+    marginRight: 20,
+  },
+  gameText: {
+    color: 'white',
+    fontSize: 21,
+    lineHeight: 42,
     fontWeight: 'bold',
     textAlign: 'center',
 

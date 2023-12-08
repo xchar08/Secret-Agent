@@ -1,18 +1,17 @@
-import { StatusBar } from 'expo-status-bar';
-import { ImageBackground, ActivityIndicator, TouchableOpacity, StyleSheet, Text, TextInput, View } from 'react-native';
-import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginPage from './src/components/LoginPage'
+import React, { useState, useEffect } from 'react';
+
 import SplashScreen from './src/components/SplashScreen'
 import SignUpScreen from './src/components/SignUpScreen'
 import GameLobby from './src/components/GameLobby';
 import CreateGame from './src/components/CreateGameScreen';
 import JoinGame from './src/components/JoinGameScreen';
 import GameScreen from './src/components/GameScreen';
-import { User, onAuthStateChanged } from 'firebase/auth'; //User object IMPORTANT
-import { FIREBASE_AUTH } from './FirebaseConfig';
 
+import { firebase as authProvider } from '@react-native-firebase/auth';
+import { AuthContext, CodeContext, HostContext, MissionContext, RoleContext } from './src/services/gameState';
 
 const AuthStack = createNativeStackNavigator();
 const GameStack = createNativeStackNavigator();
@@ -26,39 +25,61 @@ const AuthNavigator = () => (
   </AuthStack.Navigator>
 );
 
-const GameNavigator = () => (
-  <GameStack.Navigator initialRouteName="GameLobby">
-    <GameStack.Screen name="GameLobby" component={GameLobby} />
-    <GameStack.Screen name="CreateGame" component={CreateGame} />
-    <GameStack.Screen name="JoinGame" component={JoinGame} />
-    <GameStack.Screen name="GameScreen" component={GameScreen} />
-  </GameStack.Navigator>
-);
+const GameNavigator = () => {
+  //track the current game conditions using, code, host, mission, and role
+  const [code, setCode] = useState(null);
+  const [host, setHost] = useState(null);
+  const [mission, setMission] = useState(null);
+  const [role, setRole] = useState(null);
+
+  return (
+    <HostContext.Provider value={{ host, setHost }}>
+      <CodeContext.Provider value={{ code, setCode }}>
+        <MissionContext.Provider value={{ mission, setMission }}>
+          <RoleContext.Provider value={{ role, setRole }}>
+            <GameStack.Navigator initialRouteName="GameLobby">
+              <GameStack.Screen name="GameLobby" component={GameLobby} />
+              <GameStack.Screen name="CreateGame" component={CreateGame} />
+              <GameStack.Screen name="JoinGame" component={JoinGame} />
+              <GameStack.Screen name="GameScreen" component={GameScreen} />
+            </GameStack.Navigator>
+          </RoleContext.Provider>
+        </MissionContext.Provider>
+      </CodeContext.Provider>
+    </HostContext.Provider>
+  )
+};
 
 export default function App() {
+
+
+  //initialize the authentication state when the app loads,
+  // and other screens will pull this context to access 
+  // the user profile 
+  
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    onAuthStateChanged(FIREBASE_AUTH, (user) => {
-      console.log('user', user);
+
+
+    const FIREBASE_AUTH = authProvider.auth();
+
+    FIREBASE_AUTH.onAuthStateChanged((user) => {
+  
       setUser(user);
-    });
+    })
   }, []);
+
 
   //Decide which stack navigator to call based on whether or not user is logged in
   return (
-    <NavigationContainer>
-      {user ? <GameNavigator /> : <AuthNavigator />}
-    </NavigationContainer>
+    <AuthContext.Provider value={{ user, setUser }}>
+
+      <NavigationContainer>
+        {user ? <GameNavigator /> : <AuthNavigator />}
+      </NavigationContainer>
+    </AuthContext.Provider>
   );
 }
 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
